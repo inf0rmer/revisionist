@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Revisionist</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1>Revisionist</h1>
+<p>Revisionist is a simple tool to help you manage versions of content in your web application.
+Everytime your data changes, you can save it as a revision in a Revisionist instance.
+You can then access the last x versions of your content (10 by default).</p>
+<h2>Plugin Architecture</h2>
+<p>Revisionist uses a plugin architecture, so you can override the default behavior of it&#39;s two main functions.
+The &quot;Simple&quot; plugin shipped by default simply stores and returns the values as they&#39;re passed in.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">do</span> -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Simple extend function</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="function"><span class="title">extend</span></span> = (target={}, other) -&gt;
+    <span class="keyword">for</span> prop <span class="keyword">of</span> other
+      <span class="keyword">if</span> <span class="keyword">typeof</span> source[prop] <span class="keyword">is</span> <span class="string">'object'</span>
+        target[prop] = extend(target[prop], source[prop])
+      <span class="keyword">else</span>
+        target[prop] = source[prop]
+
+    <span class="keyword">return</span> target</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2>The Revisionist Class</h2>
+<p>The main public Class. When you create an instance of Revisionist, this is the public API you get back.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="class"><span class="keyword">class</span> <span class="title">Revisionist</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>The internal cache</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _cache = []</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>The plugin registry</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _plugins = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>This class method lets you register a new plugin.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="property">@register</span>: (namespace, Plugin) -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Do not register the plugin if one with the same namespace
+already exists</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> _plugins[namespace]?
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"There's already a plugin in this namespace!"</span>)
+
+      _plugins[namespace] = Plugin</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>The default options:</p>
+<p><strong>versions</strong>:
+The maximum number of versions you wish to store. The default is 10.</p>
+<p><strong>plugin</strong>:
+The plugin you wish to use. The default is &quot;simple&quot;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    options:
+      versions: <span class="number">10</span>
+      plugin: <span class="string">'simple'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>The main constructor function that gets called when Revisionist is instantiated.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    constructor: (options) -&gt;
+      <span class="property">@options</span> = extend <span class="property">@options</span>, options
+      <span class="property">@_currentVersion</span> = <span class="number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Adds a new revision for this instance.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    change: (newValue) -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Call the plugin&#39;s &quot;change&quot; function and get it&#39;s return value for storing.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      newValue = _plugin.change.call(@, <span class="property">@_currentVersion</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Bump the current version number</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="property">@_currentVersion</span> += <span class="number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Store the new version</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      _cache.push(newValue)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Keep the internal cache trimmed according to the &quot;versions&quot; option.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> <span class="property">@_currentVersion</span> &gt; <span class="property">@options</span>.versions
+        _cache.shift()
+
+      <span class="keyword">return</span> newValue</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Recovers a specific revision from the cache</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    recover: (version) -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Defaults to the current version - 1</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">unless</span> version?
+        version -= <span class="number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Throw errors if the version is out of bounds</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> version &lt; <span class="number">0</span>
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Version needs to be a positive number"</span>)
+
+      <span class="keyword">if</span> version &gt; _cache.length
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Not enough versions yet"</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Call the plugin&#39;s &quot;recover&quot; function and return it&#39;s return value.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      _plugin.recover.call(@, _cache[version])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Clears the cache</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    clear: -&gt;
+      _cache = []</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <h3>Simple Plugin</h3>
+<p>This is a reference implementation for a plugin.
+It simply stores the values as they are passed in.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  SimplePlugin =
+    change: (newValue) -&gt;
+      <span class="keyword">return</span> newValue
+
+    recover: (prevValue) -&gt;
+      <span class="keyword">return</span> prevValue</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Register the SimplePlugin</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  Revisionist.register(<span class="string">'simple'</span>, SimplePlugin)</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
