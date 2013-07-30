@@ -59,6 +59,12 @@ module.exports = (grunt) ->
               paths:
                 "revisionist": "dist/revisionist"
 
+    docco:
+      docs:
+        src: 'src/revisionist.coffee'
+        options:
+          output: 'docs/'
+
   grunt.registerTask 'default', ['coffeelint']
   grunt.registerTask 'build', [
     'coffeelint',
@@ -67,6 +73,7 @@ module.exports = (grunt) ->
     'uglify'
   ]
   grunt.registerTask 'test', ['build', 'coffee:specs', 'jasmine']
+  grunt.registerTask 'docs', ['docco']
 
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-coffeelint'
@@ -74,3 +81,4 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
   grunt.loadNpmTasks 'grunt-rigger'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
+  grunt.loadNpmTasks 'grunt-docco'
