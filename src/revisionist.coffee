@@ -1,14 +1,5 @@
-# # Revisionist
+# ## Utility functions
 #
-# Revisionist is a simple tool to help you manage versions of content in your web application.
-# Everytime your data changes, you can save it as a revision in a Revisionist instance.
-# You can then access the last x versions of your content (10 by default).
-#
-# ## Plugin Architecture
-#
-# Revisionist uses a plugin architecture, so you can override the default behavior of it's two main functions.
-# The "Simple" plugin shipped by default simply stores and returns the values as they're passed in.
-
 # Simple extend function
 extend = (target={}, other) ->
   for prop of other
@@ -106,7 +97,7 @@ class Revisionist
   clear: ->
     _cache = []
 
-# ### Simple Plugin
+# ## Simple Plugin
 #
 # This is a reference implementation for a plugin.
 # It simply stores the values as they are passed in.
@@ -117,5 +108,5 @@ SimplePlugin =
   recover: (prevValue) ->
     return prevValue
 
-# Register the SimplePlugin
+# Registers the SimplePlugin
 Revisionist.register('simple', SimplePlugin)
