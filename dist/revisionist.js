@@ -15,11 +15,13 @@
     return target;
   };
   Revisionist = (function() {
-    var _cache, _plugins;
+    var _cache, _currentVersion, _plugins;
 
     _cache = [];
 
     _plugins = {};
+
+    _currentVersion = 0;
 
     Revisionist.register = function(namespace, Plugin) {
       if (_plugins[namespace] != null) {
@@ -35,22 +37,31 @@
 
     function Revisionist(options) {
       this.options = extend(this.options, options);
-      this._currentVersion = 0;
     }
 
     Revisionist.prototype.change = function(newValue) {
-      newValue = _plugin.change.call(this, this._currentVersion);
-      this._currentVersion += 1;
+      var plugin;
+      plugin = _plugins[this.options.plugin];
+      if ((plugin != null ? plugin.change : void 0) == null) {
+        throw new Error("Plugin " + this.options.plugin + " is not available!");
+      }
+      newValue = plugin.change.call(this, newValue);
+      _currentVersion += 1;
       _cache.push(newValue);
-      if (this._currentVersion > this.options.versions) {
+      if (_currentVersion > this.options.versions) {
         _cache.shift();
       }
       return newValue;
     };
 
     Revisionist.prototype.recover = function(version) {
+      var plugin;
+      plugin = _plugins[this.options.plugin];
+      if ((plugin != null ? plugin.recover : void 0) == null) {
+        throw new Error("Plugin " + this.options.plugin + " is not available!");
+      }
       if (version == null) {
-        version -= 1;
+        version = _currentVersion - 1;
       }
       if (version < 0) {
         throw new Error("Version needs to be a positive number");
@@ -58,7 +69,7 @@
       if (version > _cache.length) {
         throw new Error("Not enough versions yet");
       }
-      return _plugin.recover.call(this, _cache[version]);
+      return plugin.recover.call(this, _cache[version]);
     };
 
     Revisionist.prototype.clear = function() {

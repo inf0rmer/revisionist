@@ -29,6 +29,9 @@ class Revisionist
   # The plugin registry
   _plugins = {}
 
+  # The version pointer
+  _currentVersion = 0
+
   # This class method lets you register a new plugin.
   @register: (namespace, Plugin) ->
     # Do not register the plugin if one with the same namespace
@@ -53,30 +56,41 @@ class Revisionist
   # The main constructor function that gets called when Revisionist is instantiated.
   constructor: (options) ->
     @options = extend @options, options
-    @_currentVersion = 0
 
   # Adds a new revision for this instance.
   change: (newValue) ->
+    # Check if the plugin is available
+    plugin = _plugins[@options.plugin]
+
+    unless plugin?.change?
+      throw new Error("Plugin #{@options.plugin} is not available!")
+
     # Call the plugin's "change" function and get it's return value for storing.
-    newValue = _plugin.change.call(@, @_currentVersion)
+    newValue = plugin.change.call(@, newValue)
 
     # Bump the current version number
-    @_currentVersion += 1
+    _currentVersion += 1
 
     # Store the new version
     _cache.push(newValue)
 
     # Keep the internal cache trimmed according to the "versions" option.
-    if @_currentVersion > @options.versions
+    if _currentVersion > @options.versions
       _cache.shift()
 
     return newValue
 
   # Recovers a specific revision from the cache
   recover: (version) ->
+    # Check if the plugin is available
+    plugin = _plugins[@options.plugin]
+
+    unless plugin?.recover?
+      throw new Error("Plugin #{@options.plugin} is not available!")
+
     # Defaults to the current version - 1
     unless version?
-      version -= 1
+      version = _currentVersion - 1
 
     # Throw errors if the version is out of bounds
     if version < 0
@@ -86,7 +100,7 @@ class Revisionist
       throw new Error("Not enough versions yet")
 
     # Call the plugin's "recover" function and return it's return value.
-    _plugin.recover.call(@, _cache[version])
+    plugin.recover.call(@, _cache[version])
 
   # Clears the cache
   clear: ->
