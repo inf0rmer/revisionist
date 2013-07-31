@@ -2,7 +2,7 @@
   "name": "revisionist",
   "version": "0.0.1",
   "description": "Revisionist is a simple utility to help you manage content revisions.",
-  "main": "dist/revisionist.js",
+  "main": "dist/revisionist.min.js",
   "scripts": {
     "test": "grunt test"
   },
@@ -11,7 +11,9 @@
     "url": "git://github.com/inf0rmer/revisionist.git"
   },
   "keywords": [
-    "versioning"
+    "versioning",
+    "revisions",
+    "undo"
   ],
   "author": "Bruno Abrantes",
   "license": "MIT",
@@ -25,9 +27,7 @@
     "grunt-coffeelint": "0.0.6",
     "grunt-rigger": "~0.4.0",
     "grunt-contrib-coffee": "~0.7.0",
-    "grunt-template-jasmine-requirejs": "~0.1.1"
-  },
-  "dependencies": {
+    "grunt-template-jasmine-requirejs": "~0.1.1",
     "grunt-docco": "~0.2.0"
   }
 }
