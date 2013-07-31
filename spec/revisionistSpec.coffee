@@ -131,7 +131,7 @@ define ['revisionist'], (Revisionist) ->
 
       Revisionist.unregisterPlugin 'custom'
 
-        it 'calls the plugin\'s "recover" method within it\'s own context', ->
+    it 'calls the plugin\'s "recover" method within it\'s own context', ->
       CustomPlugin =
         recover: ->
           @ownFunction()
@@ -144,6 +144,7 @@ define ['revisionist'], (Revisionist) ->
 
       rev = new Revisionist {plugin: 'custom'}
       rev.change('pancakes')
+      rev.recover()
 
       expect(spy).toHaveBeenCalled()
 

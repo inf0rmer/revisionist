@@ -70,7 +70,6 @@
         CustomPlugin = {
           recover: function() {},
           change: function() {
-            console.log(this);
             return this.ownFunction();
           },
           ownFunction: function() {}
@@ -151,6 +150,25 @@
         rev.change('bacon');
         rev.recover(0);
         expect(spy).toHaveBeenCalledWith('bacon');
+        return Revisionist.unregisterPlugin('custom');
+      });
+      it('calls the plugin\'s "recover" method within it\'s own context', function() {
+        var CustomPlugin, rev, spy;
+        CustomPlugin = {
+          recover: function() {
+            return this.ownFunction();
+          },
+          change: function() {},
+          ownFunction: function() {}
+        };
+        spy = spyOn(CustomPlugin, 'ownFunction');
+        Revisionist.registerPlugin('custom', CustomPlugin);
+        rev = new Revisionist({
+          plugin: 'custom'
+        });
+        rev.change('pancakes');
+        rev.recover();
+        expect(spy).toHaveBeenCalled();
         return Revisionist.unregisterPlugin('custom');
       });
       return it('defaults to the version prior to the current one', function() {
