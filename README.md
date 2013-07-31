@@ -82,7 +82,7 @@ This method will be called by the Revisionist instance when you do ```instance.r
 
 Both of these methods are executed in the context of your own plugin.
 
-### Registering the plugin
+### Registering and Unregistering a plugin
 The ```Revisionist``` class exposes a class method to register your plugins.
 
 **registerPlugin(name, hash)**
