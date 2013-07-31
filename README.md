@@ -10,12 +10,16 @@ Revisionist is open source. View the [annotated source code](http//inf0rmer.gith
 ## In a ```<script>``` tag
 Include the script in your page. A global "Revisionist" variable will be made available.
 
+```javascript
+rev = new window.Revisionist()
+```
+
 ## With an AMD loader
 Using an AMD loader such as [RequireJS](http://requirejs.org):
 
 ```javascript
 require(['path/to/revisionist'], function(Revisionist) {
-  // The "Revisionist" variable is available
+  rev = new Revisionist()
 });
 ```
 
@@ -23,10 +27,6 @@ require(['path/to/revisionist'], function(Revisionist) {
 
 ``` javascript
 Revisionist = require('path/to/revisionist')
-```
-
-Create an instance of Revisionist:
-```javascript
 rev = new Revisionist()
 ```
 
