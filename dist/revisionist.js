@@ -54,7 +54,7 @@
       if ((plugin != null ? plugin.change : void 0) == null) {
         throw new Error("Plugin " + this.options.plugin + " is not available!");
       }
-      newValue = plugin.change.call(this, newValue);
+      newValue = plugin.change.call(plugin, newValue);
       _currentVersion += 1;
       _cache.push(newValue);
       if (_currentVersion > this.options.versions) {
@@ -77,9 +77,9 @@
         throw new Error("Version needs to be a positive number");
       }
       if (version > _cache.length) {
-        throw new Error("This version doesn't exist yet");
+        throw new Error("This version doesn't exist");
       }
-      return plugin.recover.call(this, _cache[version]);
+      return plugin.recover.call(plugin, _cache[version]);
     };
 
     Revisionist.prototype.clear = function() {

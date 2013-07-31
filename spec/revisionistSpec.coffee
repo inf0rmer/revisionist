@@ -55,6 +55,24 @@ define ['revisionist'], (Revisionist) ->
 
       Revisionist.unregisterPlugin 'custom'
 
+    it 'calls the plugin\'s "change" method within it\'s own context', ->
+      CustomPlugin =
+        recover: ->
+        change: ->
+          @ownFunction()
+        ownFunction: ->
+
+      spy = spyOn CustomPlugin, 'ownFunction'
+
+      Revisionist.registerPlugin 'custom', CustomPlugin
+
+      rev = new Revisionist {plugin: 'custom'}
+      rev.change('pancakes')
+
+      expect(spy).toHaveBeenCalled()
+
+      Revisionist.unregisterPlugin 'custom'
+
     it 'only keeps a limited amount of versions', ->
       rev = new Revisionist {versions: 2}
 
@@ -110,6 +128,24 @@ define ['revisionist'], (Revisionist) ->
       rev.recover(0)
 
       expect(spy).toHaveBeenCalledWith('bacon')
+
+      Revisionist.unregisterPlugin 'custom'
+
+        it 'calls the plugin\'s "recover" method within it\'s own context', ->
+      CustomPlugin =
+        recover: ->
+          @ownFunction()
+        change: ->
+        ownFunction: ->
+
+      spy = spyOn CustomPlugin, 'ownFunction'
+
+      Revisionist.registerPlugin 'custom', CustomPlugin
+
+      rev = new Revisionist {plugin: 'custom'}
+      rev.change('pancakes')
+
+      expect(spy).toHaveBeenCalled()
 
       Revisionist.unregisterPlugin 'custom'
 

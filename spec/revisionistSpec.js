@@ -65,6 +65,25 @@
         expect(spy).toHaveBeenCalledWith('bacon');
         return Revisionist.unregisterPlugin('custom');
       });
+      it('calls the plugin\'s "change" method within it\'s own context', function() {
+        var CustomPlugin, rev, spy;
+        CustomPlugin = {
+          recover: function() {},
+          change: function() {
+            console.log(this);
+            return this.ownFunction();
+          },
+          ownFunction: function() {}
+        };
+        spy = spyOn(CustomPlugin, 'ownFunction');
+        Revisionist.registerPlugin('custom', CustomPlugin);
+        rev = new Revisionist({
+          plugin: 'custom'
+        });
+        rev.change('pancakes');
+        expect(spy).toHaveBeenCalled();
+        return Revisionist.unregisterPlugin('custom');
+      });
       return it('only keeps a limited amount of versions', function() {
         var recovered, rev;
         rev = new Revisionist({
@@ -113,7 +132,7 @@
       it('throws an Error if the version doesn\'t exist yet', function() {
         var e, rev;
         rev = new Revisionist;
-        e = new Error("This version doesn't exist yet");
+        e = new Error("This version doesn't exist");
         return expect(function() {
           return rev.recover(99);
         }).toThrow(e);

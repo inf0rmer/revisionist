@@ -65,7 +65,7 @@ class Revisionist
       throw new Error("Plugin #{@options.plugin} is not available!")
 
     # Call the plugin's "change" function and get it's return value for storing.
-    newValue = plugin.change.call(@, newValue)
+    newValue = plugin.change.call(plugin, newValue)
 
     # Bump the current version number
     _currentVersion += 1
@@ -102,7 +102,7 @@ class Revisionist
       throw new Error("This version doesn't exist")
 
     # Call the plugin's "recover" function and return it's return value.
-    plugin.recover.call(@, _cache[version])
+    plugin.recover.call(plugin, _cache[version])
 
   # Clears the cache
   clear: ->
