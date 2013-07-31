@@ -1,63 +1,186 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Revisionist : A simple utility to help you manage content revisions." />
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-    <title>Revisionist</title>
+    <title>Revisionist by inf0rmer</title>
   </head>
 
   <body>
+    <header>
+      <div class="inner">
+        <h1>Revisionist</h1>
+        <h2>A simple utility to help you manage content revisions.</h2>
+        <a href="https://github.com/inf0rmer/revisionist" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/inf0rmer/revisionist">View on GitHub</a>
-
-          <h1 id="project_title">Revisionist</h1>
-          <h2 id="project_tagline">A simple utility to help you manage content revisions.</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/inf0rmer/revisionist/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/inf0rmer/revisionist/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
 <a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h1>
 
 <p>Revisionist is a simple tool to help you manage versions of content in your web application.
 Everytime your data changes, you can save it as a revision in a Revisionist instance.
 You can then access the last x versions of your content (10 by default).</p>
 
-<p>Revisionist is open source. View the <a href="/revisionist/docs/annotated_source_code.html">annotated source code</a>.</p>
+<p>Revisionist is open source. View the <a href="http//inf0rmer.github.io/revisionist/docs/revisionist.html">annotated source code</a>.</p>
+
+<h1>
+<a name="how-to-use-it" class="anchor" href="#how-to-use-it"><span class="octicon octicon-link"></span></a>How to use it</h1>
+
+<h2>
+<a name="in-a-script-tag" class="anchor" href="#in-a-script-tag"><span class="octicon octicon-link"></span></a>In a <code>&lt;script&gt;</code> tag</h2>
+
+<p>Include the script in your page. A global "Revisionist" variable will be made available.</p>
+
+<div class="highlight"><pre><span class="nx">rev</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">window</span><span class="p">.</span><span class="nx">Revisionist</span><span class="p">()</span>
+</pre></div>
+
+<h2>
+<a name="with-an-amd-loader" class="anchor" href="#with-an-amd-loader"><span class="octicon octicon-link"></span></a>With an AMD loader</h2>
+
+<p>Using an AMD loader such as <a href="http://requirejs.org">RequireJS</a>:</p>
+
+<div class="highlight"><pre><span class="nx">require</span><span class="p">([</span><span class="s1">'path/to/revisionist'</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">Revisionist</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">rev</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Revisionist</span><span class="p">()</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="in-node" class="anchor" href="#in-node"><span class="octicon octicon-link"></span></a>In Node</h2>
+
+<div class="highlight"><pre><span class="nx">Revisionist</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path/to/revisionist'</span><span class="p">)</span>
+<span class="nx">rev</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Revisionist</span><span class="p">()</span>
+</pre></div>
+
+<h1>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h1>
+
+<p>Any instance has these two methods available:</p>
+
+<p><strong>change(newValue)</strong></p>
+
+<p>Creates a new revision. It returns the same value you passed in</p>
+
+<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'bananas'</span><span class="p">)</span>
+<span class="c1">// -&gt; 'bananas'</span>
+</pre></div>
+
+<p><strong>recover(version)</strong></p>
+
+<p>Recovers a previous version of your content and returns it.</p>
+
+<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'tomatoes'</span><span class="p">)</span>
+
+<span class="nx">rev</span><span class="p">.</span><span class="nx">recover</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1">// -&gt; 'bananas'</span>
+
+<span class="nx">rev</span><span class="p">.</span><span class="nx">recover</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1">// -&gt; 'tomatoes'</span>
+</pre></div>
+
+<h1>
+<a name="options" class="anchor" href="#options"><span class="octicon octicon-link"></span></a>Options</h1>
+
+<p>When creating a Revisionist instance, you can pass it an options hash to change the default behaviour. The available options are:</p>
+
+<p><strong>versions | Number</strong>
+The maximum number of revisions you wish to store. Defaults to 10.</p>
+
+<p><strong>plugin | String</strong>
+The plugin you wish to use with this instance. The plugin must have been registered before using the class method <code>registerPlugin</code></p>
 
 <h1>
 <a name="plugin-architecture" class="anchor" href="#plugin-architecture"><span class="octicon octicon-link"></span></a>Plugin Architecture</h1>
 
-<p>Revisionist uses a plugin architecture, so you can override the default behavior of it's two main functions.</p>
+<p>Revisionist uses a plugin architecture, so you can wrap around it's two main functions, <code>change</code> and <code>recover</code> to implement your own logic.</p>
 
 <p>The "Simple" plugin shipped by default simply stores and returns the values as they're passed in.</p>
-      </section>
+
+<h2>
+<a name="authoring-a-plugin" class="anchor" href="#authoring-a-plugin"><span class="octicon octicon-link"></span></a>Authoring a plugin</h2>
+
+<p>To write a plugin, all you really have to do is provide Revisionist with a hash containing two methods:</p>
+
+<p><strong>change(newValue)</strong></p>
+
+<p>This method will be called by the Revisionist instance when you do <code>instance.change("bananas")</code>. In this case, your implementation of <code>change</code> would receive an argument with a value of <code>bananas</code>.</p>
+
+<p><strong>recover(oldValue)</strong></p>
+
+<p>This method will be called by the Revisionist instance when you do <code>instance.recover(2)</code>. Your implementation of <code>recover</code> gets an argument with the value previously stored as revision #2.</p>
+
+<p>Both of these methods are executed in the context of your own plugin.</p>
+
+<h3>
+<a name="registering-and-unregistering-a-plugin" class="anchor" href="#registering-and-unregistering-a-plugin"><span class="octicon octicon-link"></span></a>Registering and Unregistering a plugin</h3>
+
+<p>The <code>Revisionist</code> class exposes a class method to register your plugins.</p>
+
+<p><strong>registerPlugin(name, hash)</strong></p>
+
+<p>Registers a plugin with a name and a hash containing <code>change</code> and <code>recover</code> functions. If your plugin does not follow this naming convention, it will not work properly.</p>
+
+<p>Example:</p>
+
+<div class="highlight"><pre><span class="nx">MyPlugin</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">change</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">newValue</span><span class="p">)</span> <span class="p">{},</span>
+  <span class="nx">recover</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oldValue</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="nx">Revisionist</span><span class="p">.</span><span class="nx">registerPlugin</span><span class="p">(</span><span class="s1">'myPlugin'</span><span class="p">,</span> <span class="nx">MyPlugin</span><span class="p">);</span>
+</pre></div>
+
+<p><strong>unregisterPlugin(name)</strong></p>
+
+<p>Unregisters a plugin with a given name.</p>
+
+<p>Example:</p>
+
+<div class="highlight"><pre><span class="nx">Revisionist</span><span class="p">.</span><span class="nx">unregisterPlugin</span><span class="p">(</span><span class="s1">'myPlugin'</span><span class="p">)</span>
+<span class="c1">// MyPlugin is not available anymore</span>
+</pre></div>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/inf0rmer/revisionist/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/inf0rmer/revisionist/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/inf0rmer/revisionist"></a> is maintained by <a href="https://github.com/inf0rmer">inf0rmer</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Revisionist maintained by <a href="https://github.com/inf0rmer">inf0rmer</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-5722833-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
 
   </body>
 </html>
