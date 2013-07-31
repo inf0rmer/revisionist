@@ -1,0 +1,17 @@
+{
+  "name": "revisionist",
+  "version": "0.0.1",
+  "main": "dist/revisionist.min.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "spec",
+    "docs",
+    "src",
+    "Gruntfile.coffee",
+    "package.json"
+  ]
+}
