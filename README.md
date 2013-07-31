@@ -3,7 +3,7 @@ Revisionist is a simple tool to help you manage versions of content in your web 
 Everytime your data changes, you can save it as a revision in a Revisionist instance.
 You can then access the last x versions of your content (10 by default).
 
-Revisionist is open source. View the [annotated source code](http://inf0rmer.github.io/revisionist/docs/revisionist.html).
+Revisionist is open source. View the [annotated source code](http://inf0rmer.github.io/revisionist/docs/annotated.html).
 
 # Get it
 
