@@ -1,8 +1,8 @@
 # ## Utility functions
 #
 # Simple extend function
-extend = (target={}, other) ->
-  for prop of other
+extend = (target={}, source) ->
+  for prop of source
     if typeof source[prop] is 'object'
       target[prop] = extend(target[prop], source[prop])
     else
@@ -24,13 +24,19 @@ class Revisionist
   _currentVersion = 0
 
   # This class method lets you register a new plugin.
-  @register: (namespace, Plugin) ->
-    # Do not register the plugin if one with the same namespace
-    # already exists
+  @registerPlugin: (namespace, Plugin) ->
+    # Do not register the plugin if one with the same namespace already exists
     if _plugins[namespace]?
-      throw new Error("There's already a plugin in this namespace!")
+      throw new Error("There's already a plugin in this namespace")
 
     _plugins[namespace] = Plugin
+
+  # This class method unregisters an existing plugin
+  @unregisterPlugin: (namespace) ->
+    unless _plugins[namespace]?
+      throw new Error("This plugin doesn't exist")
+
+    _plugins[namespace] = null
 
   # The default options:
   #
@@ -40,13 +46,15 @@ class Revisionist
   # **plugin**:
   # The plugin you wish to use. The default is "simple"
   #
-  options:
+  defaults:
     versions: 10
     plugin: 'simple'
 
   # The main constructor function that gets called when Revisionist is instantiated.
   constructor: (options) ->
-    @options = extend @options, options
+    @options = {}
+    extend @options, @defaults
+    extend @options, options
 
   # Adds a new revision for this instance.
   change: (newValue) ->
@@ -67,7 +75,10 @@ class Revisionist
 
     # Keep the internal cache trimmed according to the "versions" option.
     if _currentVersion > @options.versions
+      # Remove the oldest version
       _cache.shift()
+      # Keep the _currentVersion pointer
+      _currentVersion = _cache.length
 
     return newValue
 
@@ -88,14 +99,17 @@ class Revisionist
       throw new Error("Version needs to be a positive number")
 
     if version > _cache.length
-      throw new Error("Not enough versions yet")
+      throw new Error("This version doesn't exist")
 
     # Call the plugin's "recover" function and return it's return value.
     plugin.recover.call(@, _cache[version])
 
   # Clears the cache
   clear: ->
+    # Reset the internal cache
     _cache = []
+    # Reset the version pointer
+    _currentVersion = 0
 
 # ## Simple Plugin
 #
@@ -109,4 +123,4 @@ SimplePlugin =
     return prevValue
 
 # Registers the SimplePlugin
-Revisionist.register('simple', SimplePlugin)
+Revisionist.registerPlugin('simple', SimplePlugin)
