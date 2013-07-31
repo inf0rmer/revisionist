@@ -5,6 +5,14 @@ You can then access the last x versions of your content (10 by default).
 
 Revisionist is open source. View the [annotated source code](http//inf0rmer.github.io/revisionist/docs/revisionist.html).
 
+# Get it
+
+## Through [Bower](http://bower.io/)
+```bower install revisionist```
+
+## Through [NPM](https://npmjs.org/)
+```npm install revisionist```
+
 # How to use it
 
 ## In a ```<script>``` tag
