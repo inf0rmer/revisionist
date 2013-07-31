@@ -7,7 +7,7 @@ Revisionist is open source. View the [annotated source code](http//inf0rmer.gith
 
 # How to use it
 
-## In a <script> tag
+## In a ```<script>``` tag
 Include the script in your page. A global "Revisionist" variable will be made available.
 
 ## With an AMD loader
