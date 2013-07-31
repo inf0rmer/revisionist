@@ -59,9 +59,11 @@ rev.recover(1)
 When creating a Revisionist instance, you can pass it an options hash to change the default behaviour. The available options are:
 
 **versions | Number**
+
 The maximum number of revisions you wish to store. Defaults to 10.
 
 **plugin | String**
+
 The plugin you wish to use with this instance. The plugin must have been registered before using the class method ```registerPlugin```
 
 # Plugin Architecture
