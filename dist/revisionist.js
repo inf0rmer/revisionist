@@ -1,11 +1,11 @@
 (function(global) {
   var Revisionist, SimplePlugin, extend;
-  extend = function(target, other) {
+  extend = function(target, source) {
     var prop;
     if (target == null) {
       target = {};
     }
-    for (prop in other) {
+    for (prop in source) {
       if (typeof source[prop] === 'object') {
         target[prop] = extend(target[prop], source[prop]);
       } else {
@@ -23,20 +23,29 @@
 
     _currentVersion = 0;
 
-    Revisionist.register = function(namespace, Plugin) {
+    Revisionist.registerPlugin = function(namespace, Plugin) {
       if (_plugins[namespace] != null) {
-        throw new Error("There's already a plugin in this namespace!");
+        throw new Error("There's already a plugin in this namespace");
       }
       return _plugins[namespace] = Plugin;
     };
 
-    Revisionist.prototype.options = {
+    Revisionist.unregisterPlugin = function(namespace) {
+      if (_plugins[namespace] == null) {
+        throw new Error("This plugin doesn't exist");
+      }
+      return _plugins[namespace] = null;
+    };
+
+    Revisionist.prototype.defaults = {
       versions: 10,
       plugin: 'simple'
     };
 
     function Revisionist(options) {
-      this.options = extend(this.options, options);
+      this.options = {};
+      extend(this.options, this.defaults);
+      extend(this.options, options);
     }
 
     Revisionist.prototype.change = function(newValue) {
@@ -50,6 +59,7 @@
       _cache.push(newValue);
       if (_currentVersion > this.options.versions) {
         _cache.shift();
+        _currentVersion = _cache.length;
       }
       return newValue;
     };
@@ -67,13 +77,14 @@
         throw new Error("Version needs to be a positive number");
       }
       if (version > _cache.length) {
-        throw new Error("Not enough versions yet");
+        throw new Error("This version doesn't exist yet");
       }
       return plugin.recover.call(this, _cache[version]);
     };
 
     Revisionist.prototype.clear = function() {
-      return _cache = [];
+      _cache = [];
+      return _currentVersion = 0;
     };
 
     return Revisionist;
@@ -87,7 +98,7 @@
       return prevValue;
     }
   };
-  Revisionist.register('simple', SimplePlugin);
+  Revisionist.registerPlugin('simple', SimplePlugin);
   if (typeof define === 'function' && (define.amd != null)) {
     return define(function() {
       return Revisionist;
