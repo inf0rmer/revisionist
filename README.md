@@ -98,3 +98,13 @@ MyPlugin = {
 
 Revisionist.registerPlugin('myPlugin', MyPlugin);
 ```
+
+**unregisterPlugin(name)**
+
+Unregisters a plugin with a given name.
+
+Example:
+```javascript
+Revisionist.unregisterPlugin('myPlugin')
+// MyPlugin is not available anymore
+```
