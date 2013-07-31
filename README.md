@@ -85,6 +85,16 @@ Both of these methods are executed in the context of your own plugin.
 ### Registering the plugin
 The ```Revisionist``` class exposes a class method to register your plugins.
 
-**registerPlugin(name | String, hash | Object)**
+**registerPlugin(name, hash)**
 
 Registers a plugin with a name and a hash containing ```change``` and ```recover``` functions. If your plugin does not follow this naming convention, it will not work properly.
+
+Example:
+```javascript
+MyPlugin = {
+  change: function(newValue) {},
+  recover: function(oldValue) {}
+}
+
+Revisionist.registerPlugin('myPlugin', MyPlugin);
+```
