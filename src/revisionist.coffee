@@ -1,14 +1,10 @@
 # ## Utility functions
 #
-# Simple extend function
-extend = (target={}, source) ->
-  for prop of source
-    if typeof source[prop] is 'object'
-      target[prop] = extend(target[prop], source[prop])
-    else
-      target[prop] = source[prop]
+# String Diff function
+_stringDiff = require('./lib/diff')
 
-  return target
+# Extend function
+extend = require('./lib/extend.coffee')
 
 # ## The Revisionist Class
 #
@@ -22,6 +18,15 @@ class Revisionist
 
   # The version pointer
   _currentVersion = 0
+
+  # Helper function for getting the previous version of the current one.
+  _getPreviousVersion = ->
+    version = _currentVersion - 1
+
+    if version < 0
+      version = 0
+
+    return version
 
   # This class method lets you register a new plugin.
   @registerPlugin: (namespace, Plugin) ->
@@ -92,7 +97,7 @@ class Revisionist
 
     # Defaults to the current version - 1
     unless version?
-      version = _currentVersion - 1
+      version = _getPreviousVersion()
 
     # Throw errors if the version is out of bounds
     if version < 0
@@ -103,6 +108,29 @@ class Revisionist
 
     # Call the plugin's "recover" function and return it's return value.
     plugin.recover.call(plugin, _cache[version])
+
+  # Represents the difference between two versions.
+  diff: (v1, v2) ->
+    # If no v1 is passed in, the current version is assumed
+    unless v1?
+      v1 = _currentVersion - 1
+
+    # If no v2 is passed in, the current version - 1 is assumed.
+    unless v2?
+      v2 = _currentVersion - 2
+
+    value1 = @recover v1
+    value2 = @recover v2
+
+    # Bail out if the type of each version does not match
+    unless typeof value1 is typeof value2
+      throw new Error('The content types of both versions must match')
+
+    # Call the appropriate diff script
+    type = typeof value1
+    switch type
+      when 'string' then _stringDiff(value2, value1)
+      else throw Error("Diff algorithm unavailable for values of type #{type}")
 
   # Clears the cache
   clear: ->
@@ -124,3 +152,5 @@ SimplePlugin =
 
 # Registers the SimplePlugin
 Revisionist.registerPlugin('simple', SimplePlugin)
+
+module.exports = Revisionist
