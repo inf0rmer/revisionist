@@ -61,6 +61,10 @@ class Revisionist
     extend @options, @defaults
     extend @options, options
 
+  # Implements a getter for _currentVersion
+  getLatestVersionNumber: ->
+    _currentVersion-1
+
   # Adds a new revision for this instance.
   change: (newValue) ->
     # Check if the plugin is available
