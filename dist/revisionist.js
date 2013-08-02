@@ -136,9 +136,9 @@ module.exports = extend;
 
 
 },{}],3:[function(require,module,exports){
-var Revisionist, SimplePlugin, extend, _stringDiff;
+var Revisionist, SimplePlugin, extend, htmlDiff;
 
-_stringDiff = require('./lib/diff');
+htmlDiff = require('./lib/diff');
 
 extend = require('./lib/extend.coffee');
 
@@ -224,7 +224,7 @@ Revisionist = (function() {
   };
 
   Revisionist.prototype.diff = function(v1, v2) {
-    var type, value1, value2;
+    var max, min;
     if (v1 == null) {
       v1 = _currentVersion - 1;
       if (v1 < 0) {
@@ -237,20 +237,21 @@ Revisionist = (function() {
         v2 = 0;
       }
     }
-    value1 = this.recover(v1);
-    value2 = this.recover(v2);
-    if (typeof value1 !== typeof value2) {
+    min = Math.min(v1, v2);
+    max = Math.max(v1, v2);
+    return {
+      old: this.recover(min),
+      "new": this.recover(max)
+    };
+  };
+
+  Revisionist.prototype.visualDiff = function(v1, v2) {
+    var diff;
+    diff = this.diff(v1, v2);
+    if (!(typeof diff.old === 'string' && typeof diff["new"] === 'string')) {
       throw new Error('The content types of both versions must match');
     }
-    type = typeof value1;
-    switch (type) {
-      case 'string':
-        return _stringDiff(value2, value1);
-      case 'number':
-        return value2 - value1;
-      default:
-        throw Error("Diff algorithm unavailable for values of type " + type);
-    }
+    return htmlDiff(diff.old, diff["new"]);
   };
 
   Revisionist.prototype.clear = function() {

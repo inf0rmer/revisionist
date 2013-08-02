@@ -2,6 +2,11 @@ define ['revisionist'], (Revisionist) ->
 
   describe 'Constructor', ->
 
+    rev = null
+    afterEach ->
+      rev?.clear()
+      rev = null
+
     it 'defines the Revisionist class', ->
       expect(Revisionist).toBeDefined()
 
@@ -19,6 +24,10 @@ define ['revisionist'], (Revisionist) ->
       expect(rev.options.plugin).toBe('complex')
 
   describe '#change', ->
+    rev = null
+    afterEach ->
+      rev?.clear()
+      rev = null
 
     it 'throws an Error if the plugin can\'t be found', ->
       rev = new Revisionist {plugin: 'unexistant'}
@@ -84,6 +93,10 @@ define ['revisionist'], (Revisionist) ->
       expect(recovered).toEqual('bacon')
 
   describe '#recover', ->
+    rev = null
+    afterEach ->
+      rev?.clear()
+      rev = null
 
     it 'throws an Error if the plugin can\'t be found', ->
       rev = new Revisionist {plugin: 'unexistant'}
@@ -117,7 +130,8 @@ define ['revisionist'], (Revisionist) ->
     it 'calls the plugin\'s "recover" method with the revision value as an argument', ->
       CustomPlugin =
         recover: ->
-        change: ->
+        change: (value)->
+          value
 
       spy = spyOn CustomPlugin, 'recover'
 
@@ -170,21 +184,15 @@ define ['revisionist'], (Revisionist) ->
       rev.clear()
       rev = null
 
-    it 'throws an Error if the content types mismatch', ->
-      rev.change 'string'
-      rev.change 2
+    it 'returns a diff hash with old and new keys', ->
+      rev.change 1
+      rev.change 3
+      rev.change 10
 
-      e = new Error('The content types of both versions must match')
-
-      expect( -> rev.diff()).toThrow(e)
-
-    it 'throws an Error if the content type is not supported', ->
-      rev.change [1, 2]
-      rev.change [2, 3]
-
-      e = new Error('Diff algorithm unavailable for values of type object')
-
-      expect( -> rev.diff()).toThrow(e)
+      diff = rev.diff(0, 2)
+      console.log diff
+      expect(diff.old).toEqual(1)
+      expect(diff.new).toEqual(10)
 
     it 'compares the two most recent versions if no parameters are passed in', ->
       rev.change 1
@@ -193,7 +201,8 @@ define ['revisionist'], (Revisionist) ->
 
       diff = rev.diff()
 
-      expect(diff).toEqual(-7)
+      expect(diff.old).toEqual(3)
+      expect(diff.new).toEqual(10)
 
     it 'compares the passed in version against the version before it if only one parameter is passed in', ->
       rev.change 1
@@ -202,25 +211,41 @@ define ['revisionist'], (Revisionist) ->
 
       diff = rev.diff(1)
 
-      expect(diff).toEqual(-2)
+      expect(diff.old).toEqual(1)
+      expect(diff.new).toEqual(3)
 
-    it 'returns a number difference for Number values', ->
-      rev.change 1
-      rev.change 3
+  describe '#visualDiff', ->
 
-      diff = rev.diff()
+    rev = null
 
-      expect(diff).toEqual(-2)
+    beforeEach ->
+      rev = new Revisionist
 
-    it 'returns an HTML diff for String values', ->
+    afterEach ->
+      rev.clear()
+      rev = null
+
+    it 'throws an Error if the content types are not both String', ->
+      rev.change 'string'
+      rev.change 2
+
+      e = new Error('The content types of both versions must match')
+
+      expect( -> rev.visualDiff()).toThrow(e)
+
+    it 'returns an HTML annotated diff for String values', ->
       rev.change 'fox'
       rev.change 'the brown fox jumped over the lazy wizard'
       expectedDiff = '<ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>'
 
-      diff = rev.diff()
+      diff = rev.visualDiff()
       expect(diff).toEqual(expectedDiff)
 
   describe '#getLatestVersionNumber', ->
+    rev = null
+    afterEach ->
+      rev?.clear()
+      rev = null
 
     it "exposes the latest version number", ->
       rev = new Revisionist

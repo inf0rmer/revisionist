@@ -1,7 +1,7 @@
 # ## Utility functions
 #
-# String Diff function
-_stringDiff = require('./lib/diff')
+# HTML annotated Diff function
+htmlDiff = require('./lib/diff')
 
 # Extend function
 extend = require('./lib/extend.coffee')
@@ -125,19 +125,25 @@ class Revisionist
       v2 = v1 - 1
       v2 = 0 if v2 < 0
 
-    value1 = @recover v1
-    value2 = @recover v2
+    # Figure out which one is the old value and the new value
+    min = Math.min(v1, v2)
+    max = Math.max(v1, v2)
 
-    # Bail out if the type of each version does not match
-    unless typeof value1 is typeof value2
+    # Returns the diff hash
+    return {
+      old: @recover(min)
+      new: @recover(max)
+    }
+
+  visualDiff: (v1, v2) ->
+    # Pipes diff() into the htmlDiff() module
+    diff = @diff(v1, v2)
+
+    # Bail out if both versions are not Strings
+    unless typeof diff.old is 'string' and typeof diff.new is 'string'
       throw new Error('The content types of both versions must match')
 
-    # Call the appropriate diff script
-    type = typeof value1
-    switch type
-      when 'string' then _stringDiff(value2, value1)
-      when 'number' then value2 - value1
-      else throw Error("Diff algorithm unavailable for values of type #{type}")
+    return htmlDiff diff.old, diff.new
 
   # Clears the cache
   clear: ->

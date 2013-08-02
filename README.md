@@ -69,23 +69,25 @@ Presents the difference between two versions.
 If no parameters are passed in, the two latest versions are assumed.
 If only the first parameter is passed, it is checked against the version before it.
 
-The currently supported difference algorithms include support for ```String``` and ```Number``` values.
+Calling diff returns a hash with two keys, ```old``` and ```new```, containing the values for the oldest and newest versions passed in.
 
 ```javascript
 rev.change(2)
 rev.change(10)
 
 rev.diff()
-// -> -8
+// -> { old: 2, new: 10 }
 ```
 
-The ```String``` algorithm will produce an HTML annotated diff string:
+**visualDiff(version1, version2)**
+
+This function will produce an HTML annotated diff string. If any non-String values are detected, an Error will be thrown.
 
 ```javascript
 rev.change('fox')
 rev.change('the brown fox jumped over the lazy wizard')
 
-rev.diff()
+rev.visualDiff()
 // -> <ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>
 ```
 
