@@ -89,6 +89,19 @@ rev.diff()
 // -> <ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>
 ```
 
+**getLatestVersionNumber**
+
+Returns the index for the last saved version. The earliest version stored is always 0, so:
+
+```javascript
+rev.change('once')
+rev.change('twice')
+rev.change('thrice')
+
+rev.getLatestVersionNumber()
+// -> 2
+```
+
 **clear**
 
 Clears the internal cache for this instance.

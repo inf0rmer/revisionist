@@ -220,6 +220,18 @@ define ['revisionist'], (Revisionist) ->
       diff = rev.diff()
       expect(diff).toEqual(expectedDiff)
 
+  describe '#getLatestVersionNumber', ->
+
+    it "exposes the latest version number", ->
+      rev = new Revisionist
+      rev.change(1)
+      rev.change(2)
+      rev.change(3)
+
+      latest = rev.getLatestVersionNumber()
+
+      expect(latest).toEqual(2)
+
   describe '.registerPlugin', ->
 
     it "exposes the registerPlugin method as a Class method", ->

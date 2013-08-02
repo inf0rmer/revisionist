@@ -185,6 +185,10 @@ Revisionist = (function() {
     extend(this.options, options);
   }
 
+  Revisionist.prototype.getLatestVersionNumber = function() {
+    return _currentVersion - 1;
+  };
+
   Revisionist.prototype.change = function(newValue) {
     var plugin;
     plugin = _plugins[this.options.plugin];

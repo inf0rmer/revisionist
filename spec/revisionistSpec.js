@@ -241,6 +241,17 @@
         return expect(diff).toEqual(expectedDiff);
       });
     });
+    describe('#getLatestVersionNumber', function() {
+      return it("exposes the latest version number", function() {
+        var latest, rev;
+        rev = new Revisionist;
+        rev.change(1);
+        rev.change(2);
+        rev.change(3);
+        latest = rev.getLatestVersionNumber();
+        return expect(latest).toEqual(2);
+      });
+    });
     return describe('.registerPlugin', function() {
       return it("exposes the registerPlugin method as a Class method", function() {
         return expect(Revisionist.registerPlugin).toEqual(jasmine.any(Function));
