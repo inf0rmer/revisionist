@@ -124,6 +124,48 @@ You can then access the last x versions of your content (10 by default).</p>
 <span class="c1">// -&gt; 'tomatoes'</span>
 </pre></div>
 
+<p><strong>diff(version1, version2)</strong></p>
+
+<p>Presents the difference between two versions.
+If no parameters are passed in, the two latest versions are assumed.
+If only the first parameter is passed, it is checked against the version before it.</p>
+
+<p>Calling diff returns a hash with two keys, <code>old</code> and <code>new</code>, containing the values for the oldest and newest versions passed in.</p>
+
+<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="nx">rev</span><span class="p">.</span><span class="nx">diff</span><span class="p">()</span>
+<span class="c1">// -&gt; { old: 2, new: 10 }</span>
+</pre></div>
+
+<p><strong>visualDiff(version1, version2)</strong></p>
+
+<p>This function will produce an HTML annotated diff string. If any non-String values are detected, an Error will be thrown.</p>
+
+<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'fox'</span><span class="p">)</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'the brown fox jumped over the lazy wizard'</span><span class="p">)</span>
+
+<span class="nx">rev</span><span class="p">.</span><span class="nx">visualDiff</span><span class="p">()</span>
+<span class="c1">// -&gt; &lt;ins&gt;the &lt;/ins&gt;&lt;ins&gt;brown &lt;/ins&gt; fox &lt;ins&gt;jumped &lt;/ins&gt;&lt;ins&gt;over &lt;/ins&gt;&lt;ins&gt;the &lt;/ins&gt;&lt;ins&gt;lazy &lt;/ins&gt;&lt;ins&gt;wizard\n&lt;/ins&gt;</span>
+</pre></div>
+
+<p><strong>getLatestVersionNumber</strong></p>
+
+<p>Returns the index for the last saved version. The earliest version stored is always 0, so:</p>
+
+<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'once'</span><span class="p">)</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'twice'</span><span class="p">)</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'thrice'</span><span class="p">)</span>
+
+<span class="nx">rev</span><span class="p">.</span><span class="nx">getLatestVersionNumber</span><span class="p">()</span>
+<span class="c1">// -&gt; 2</span>
+</pre></div>
+
+<p><strong>clear</strong></p>
+
+<p>Clears the internal cache for this instance.</p>
+
 <h1>
 <a name="options" class="anchor" href="#options"><span class="octicon octicon-link"></span></a>Options</h1>
 
