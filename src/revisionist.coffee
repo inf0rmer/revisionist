@@ -146,6 +146,9 @@ class Revisionist
     # Reset the version pointer
     _currentVersion = 0
 
+    # Chain 'this' through
+    return @
+
 # ## Simple Plugin
 #
 # This is a reference implementation for a plugin.
