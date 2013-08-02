@@ -160,10 +160,68 @@ define ['revisionist'], (Revisionist) ->
 
       expect(recovered).toEqual('oranges')
 
-  describe '#registerPlugin', ->
+  describe '#diff', ->
+    rev = null
+
+    beforeEach ->
+      rev = new Revisionist
+
+    afterEach ->
+      rev.clear()
+      rev = null
+
+    it 'throws an Error if the content types mismatch', ->
+      rev.change 'string'
+      rev.change 2
+
+      e = new Error('The content types of both versions must match')
+
+      expect( -> rev.diff()).toThrow(e)
+
+    it 'throws an Error if the content type is not supported', ->
+      rev.change [1, 2]
+      rev.change [2, 3]
+
+      e = new Error('Diff algorithm unavailable for values of type object')
+
+      expect( -> rev.diff()).toThrow(e)
+
+    it 'compares the two most recent versions if no parameters are passed in', ->
+      rev.change 1
+      rev.change 3
+      rev.change 10
+
+      diff = rev.diff()
+
+      expect(diff).toEqual(-7)
+
+    it 'compares the passed in version against the version before it if only one parameter is passed in', ->
+      rev.change 1
+      rev.change 3
+      rev.change 10
+
+      diff = rev.diff(1)
+
+      expect(diff).toEqual(-2)
+
+    it 'returns a number difference for Number values', ->
+      rev.change 1
+      rev.change 3
+
+      diff = rev.diff()
+
+      expect(diff).toEqual(-2)
+
+    it 'returns an HTML diff for String values', ->
+      rev.change 'fox'
+      rev.change 'the brown fox jumped over the lazy wizard'
+      expectedDiff = '<ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>'
+
+      diff = rev.diff()
+      expect(diff).toEqual(expectedDiff)
+
+  describe '.registerPlugin', ->
 
     it "exposes the registerPlugin method as a Class method", ->
       expect(Revisionist.registerPlugin).toEqual(jasmine.any(Function))
-
-
 

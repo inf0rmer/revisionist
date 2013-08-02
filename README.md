@@ -63,6 +63,36 @@ rev.recover(1)
 // -> 'tomatoes'
 ```
 
+**diff(version1, version2)**
+
+Presents the difference between two versions.
+If no parameters are passed in, the two latest versions are assumed.
+If only the first parameter is passed, it is checked against the version before it.
+
+The currently supported difference algorithms include support for ```String``` and ```Number``` values.
+
+```javascript
+rev.change(2)
+rev.change(10)
+
+rev.diff()
+// -> -8
+```
+
+The ```String``` algorithm will produce an HTML annotated diff string:
+
+```javascript
+rev.change('fox')
+rev.change('the brown fox jumped over the lazy wizard')
+
+rev.diff()
+// -> <ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>
+```
+
+**clear**
+
+Clears the internal cache for this instance.
+
 # Options
 When creating a Revisionist instance, you can pass it an options hash to change the default behaviour. The available options are:
 

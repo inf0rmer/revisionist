@@ -181,7 +181,67 @@
         return expect(recovered).toEqual('oranges');
       });
     });
-    return describe('#registerPlugin', function() {
+    describe('#diff', function() {
+      var rev;
+      rev = null;
+      beforeEach(function() {
+        return rev = new Revisionist;
+      });
+      afterEach(function() {
+        rev.clear();
+        return rev = null;
+      });
+      it('throws an Error if the content types mismatch', function() {
+        var e;
+        rev.change('string');
+        rev.change(2);
+        e = new Error('The content types of both versions must match');
+        return expect(function() {
+          return rev.diff();
+        }).toThrow(e);
+      });
+      it('throws an Error if the content type is not supported', function() {
+        var e;
+        rev.change([1, 2]);
+        rev.change([2, 3]);
+        e = new Error('Diff algorithm unavailable for values of type object');
+        return expect(function() {
+          return rev.diff();
+        }).toThrow(e);
+      });
+      it('compares the two most recent versions if no parameters are passed in', function() {
+        var diff;
+        rev.change(1);
+        rev.change(3);
+        rev.change(10);
+        diff = rev.diff();
+        return expect(diff).toEqual(-7);
+      });
+      it('compares the passed in version against the version before it if only one parameter is passed in', function() {
+        var diff;
+        rev.change(1);
+        rev.change(3);
+        rev.change(10);
+        diff = rev.diff(1);
+        return expect(diff).toEqual(-2);
+      });
+      it('returns a number difference for Number values', function() {
+        var diff;
+        rev.change(1);
+        rev.change(3);
+        diff = rev.diff();
+        return expect(diff).toEqual(-2);
+      });
+      return it('returns an HTML diff for String values', function() {
+        var diff, expectedDiff;
+        rev.change('fox');
+        rev.change('the brown fox jumped over the lazy wizard');
+        expectedDiff = '<ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>';
+        diff = rev.diff();
+        return expect(diff).toEqual(expectedDiff);
+      });
+    });
+    return describe('.registerPlugin', function() {
       return it("exposes the registerPlugin method as a Class method", function() {
         return expect(Revisionist.registerPlugin).toEqual(jasmine.any(Function));
       });

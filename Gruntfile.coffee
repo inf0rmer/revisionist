@@ -12,12 +12,6 @@ module.exports = (grunt) ->
       specs:
         files:
           'spec/revisionistSpec.js': 'spec/revisionistSpec.coffee'
-      compile:
-        options:
-          sourceMap: true
-          bare: true
-        files:
-          'dist/<%= pkg.name %>.js': 'dist/<%= pkg.name %>.coffee'
 
     uglify:
       options:
@@ -65,11 +59,16 @@ module.exports = (grunt) ->
         options:
           output: 'docs/'
 
+    browserify:
+      'dist/revisionist.js': ['src/revisionist.coffee']
+      options:
+        transform: ['coffeeify']
+        standalone: 'Revisionist'
+
   grunt.registerTask 'default', ['coffeelint']
   grunt.registerTask 'build', [
     'coffeelint',
-    'rig',
-    'coffee',
+    'browserify',
     'uglify'
   ]
   grunt.registerTask 'test', ['build', 'coffee:specs', 'jasmine']
@@ -82,3 +81,4 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-rigger'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-docco'
+  grunt.loadNpmTasks 'grunt-browserify'
