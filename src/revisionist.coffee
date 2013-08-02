@@ -114,10 +114,12 @@ class Revisionist
     # If no v1 is passed in, the current version is assumed
     unless v1?
       v1 = _currentVersion - 1
+      v1 = 0 if v1 < 0
 
-    # If no v2 is passed in, the current version - 1 is assumed.
+    # If no v2 is passed in, v1 - 1 is assumed.
     unless v2?
-      v2 = _currentVersion - 2
+      v2 = v1 - 1
+      v2 = 0 if v2 < 0
 
     value1 = @recover v1
     value2 = @recover v2
@@ -130,6 +132,7 @@ class Revisionist
     type = typeof value1
     switch type
       when 'string' then _stringDiff(value2, value1)
+      when 'number' then value2 - value1
       else throw Error("Diff algorithm unavailable for values of type #{type}")
 
   # Clears the cache

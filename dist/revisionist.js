@@ -223,9 +223,15 @@ Revisionist = (function() {
     var type, value1, value2;
     if (v1 == null) {
       v1 = _currentVersion - 1;
+      if (v1 < 0) {
+        v1 = 0;
+      }
     }
     if (v2 == null) {
-      v2 = _currentVersion - 2;
+      v2 = v1 - 1;
+      if (v2 < 0) {
+        v2 = 0;
+      }
     }
     value1 = this.recover(v1);
     value2 = this.recover(v2);
@@ -236,6 +242,8 @@ Revisionist = (function() {
     switch (type) {
       case 'string':
         return _stringDiff(value2, value1);
+      case 'number':
+        return value2 - value1;
       default:
         throw Error("Diff algorithm unavailable for values of type " + type);
     }

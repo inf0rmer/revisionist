@@ -202,12 +202,35 @@
       });
       it('throws an Error if the content type is not supported', function() {
         var e;
-        rev.change(50);
-        rev.change(2);
-        e = new Error('Diff algorithm unavailable for values of type number');
+        rev.change([1, 2]);
+        rev.change([2, 3]);
+        e = new Error('Diff algorithm unavailable for values of type object');
         return expect(function() {
           return rev.diff();
         }).toThrow(e);
+      });
+      it('compares the two most recent versions if no parameters are passed in', function() {
+        var diff;
+        rev.change(1);
+        rev.change(3);
+        rev.change(10);
+        diff = rev.diff();
+        return expect(diff).toEqual(-7);
+      });
+      it('compares the passed in version against the version before it if only one parameter is passed in', function() {
+        var diff;
+        rev.change(1);
+        rev.change(3);
+        rev.change(10);
+        diff = rev.diff(1);
+        return expect(diff).toEqual(-2);
+      });
+      it('returns a number difference for Number values', function() {
+        var diff;
+        rev.change(1);
+        rev.change(3);
+        diff = rev.diff();
+        return expect(diff).toEqual(-2);
       });
       return it('returns an HTML diff for String values', function() {
         var diff, expectedDiff;

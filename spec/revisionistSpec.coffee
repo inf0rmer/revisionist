@@ -179,12 +179,38 @@ define ['revisionist'], (Revisionist) ->
       expect( -> rev.diff()).toThrow(e)
 
     it 'throws an Error if the content type is not supported', ->
-      rev.change 50
-      rev.change 2
+      rev.change [1, 2]
+      rev.change [2, 3]
 
-      e = new Error('Diff algorithm unavailable for values of type number')
+      e = new Error('Diff algorithm unavailable for values of type object')
 
       expect( -> rev.diff()).toThrow(e)
+
+    it 'compares the two most recent versions if no parameters are passed in', ->
+      rev.change 1
+      rev.change 3
+      rev.change 10
+
+      diff = rev.diff()
+
+      expect(diff).toEqual(-7)
+
+    it 'compares the passed in version against the version before it if only one parameter is passed in', ->
+      rev.change 1
+      rev.change 3
+      rev.change 10
+
+      diff = rev.diff(1)
+
+      expect(diff).toEqual(-2)
+
+    it 'returns a number difference for Number values', ->
+      rev.change 1
+      rev.change 3
+
+      diff = rev.diff()
+
+      expect(diff).toEqual(-2)
 
     it 'returns an HTML diff for String values', ->
       rev.change 'fox'
