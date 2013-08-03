@@ -69,6 +69,8 @@ Presents the difference between two versions.
 If no parameters are passed in, the two latest versions are assumed.
 If only the first parameter is passed, it is checked against the version before it.
 
+This function uses the Store's ```get``` methods directly instead of Revisionist's ```recover```, so the Plugin's code will not run when calling ```diff```.
+
 Calling diff returns a hash with two keys, ```old``` and ```new```, containing the values for the oldest and newest versions passed in.
 
 ```javascript
