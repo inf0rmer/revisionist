@@ -220,10 +220,9 @@ Revisionist = (function() {
     var Store;
     Store = _stores[store];
     if (Store == null) {
-      throw new Error("The Store '" + Store + "' is not available!");
+      throw new Error("The Store '" + store + "' is not available!");
     }
-    _store = new Store(this.options);
-    return typeof _store.initialize === "function" ? _store.initialize() : void 0;
+    return _store = new Store(this.options);
   };
 
   Revisionist.prototype.change = function(newValue) {
@@ -318,13 +317,11 @@ var SimpleStore;
 SimpleStore = (function() {
   var _cache;
 
-  function SimpleStore() {}
-
   _cache = [];
 
-  SimpleStore.prototype.initialize = function(options) {
+  function SimpleStore(options) {
     this.options = options;
-  };
+  }
 
   SimpleStore.prototype.set = function(value, version) {
     return _cache.push(value);

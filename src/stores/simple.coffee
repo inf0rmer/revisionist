@@ -1,7 +1,7 @@
 class SimpleStore
   _cache = []
 
-  initialize: (@options) ->
+  constructor: (@options) ->
 
   set: (value, version) ->
     _cache.push(value)

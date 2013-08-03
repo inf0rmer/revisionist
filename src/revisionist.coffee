@@ -87,13 +87,10 @@ class Revisionist
     # Bail if the chosen store is not available in the store registry
     Store = _stores[store]
     unless Store?
-      throw new Error("The Store '#{Store}' is not available!")
+      throw new Error("The Store '#{store}' is not available!")
 
     # Construct the Store
     _store = new Store(@options)
-
-    # Call the store's "initialize" method if it exists
-    _store.initialize?()
 
   # Adds a new revision for this instance.
   change: (newValue) ->

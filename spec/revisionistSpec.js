@@ -63,6 +63,27 @@
         }).toThrow(e);
         return Revisionist.unregisterPlugin('incomplete');
       });
+      it('calls the store\'s "set" method with the new value and the new revision number as arguments', function() {
+        var CustomStore, spy;
+        CustomStore = (function() {
+          function CustomStore() {}
+
+          CustomStore.prototype.set = function(value, version) {};
+
+          CustomStore.prototype.clear = function() {};
+
+          return CustomStore;
+
+        })();
+        Revisionist.registerStore('custom', CustomStore);
+        rev = new Revisionist({
+          store: 'custom'
+        });
+        spy = spyOn(CustomStore.prototype, 'set');
+        rev.change('bacon');
+        expect(spy).toHaveBeenCalledWith('bacon', 1);
+        return Revisionist.unregisterStore('custom');
+      });
       it('calls the plugin\'s "change" method with the new value as an argument', function() {
         var CustomPlugin, spy;
         CustomPlugin = {
@@ -157,6 +178,31 @@
           return rev.recover(99);
         }).toThrow(e);
       });
+      it('calls the store\'s "get" method with the revision number as an argument', function() {
+        var CustomStore;
+        CustomStore = (function() {
+          function CustomStore() {}
+
+          CustomStore.prototype.get = function(version) {
+            return "bacon";
+          };
+
+          CustomStore.prototype.size = function() {
+            return 1;
+          };
+
+          CustomStore.prototype.clear = function() {};
+
+          return CustomStore;
+
+        })();
+        Revisionist.registerStore('custom', CustomStore);
+        rev = new Revisionist({
+          store: 'custom'
+        });
+        expect(rev.recover()).toEqual('bacon');
+        return Revisionist.unregisterStore('custom');
+      });
       it('calls the plugin\'s "recover" method with the revision value as an argument', function() {
         var CustomPlugin, spy;
         CustomPlugin = {
@@ -220,7 +266,6 @@
         rev.change(3);
         rev.change(10);
         diff = rev.diff(0, 2);
-        console.log(diff);
         expect(diff.old).toEqual(1);
         return expect(diff["new"]).toEqual(10);
       });
@@ -288,6 +333,36 @@
         rev.change(3);
         latest = rev.getLatestVersionNumber();
         return expect(latest).toEqual(2);
+      });
+    });
+    describe('#setStore', function() {
+      it('throws an Error if an non-existing store is set', function() {
+        var e, rev;
+        rev = new Revisionist;
+        e = new Error("The Store 'bogus' is not available!");
+        return expect(function() {
+          return rev.setStore('bogus');
+        }).toThrow(e);
+      });
+      return it('calls the Store constructor with the Revisionist options hash as an argument', function() {
+        var CustomStore, done, opts, rev;
+        opts = null;
+        done = false;
+        CustomStore = (function() {
+          function CustomStore(options) {
+            opts = options;
+            done = true;
+          }
+
+          return CustomStore;
+
+        })();
+        Revisionist.registerStore('custom', CustomStore);
+        rev = new Revisionist;
+        rev.setStore('custom');
+        expect(done).toBeTruthy();
+        expect(opts).toEqual(rev.options);
+        return Revisionist.unregisterStore('custom', CustomStore);
       });
     });
     describe('.registerPlugin', function() {
