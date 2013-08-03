@@ -161,8 +161,8 @@ class Revisionist
 
     # Returns the diff hash
     return {
-      old: @recover(min)
-      new: @recover(max)
+      old: _store.get(min)
+      new: _store.get(max)
     }
 
   visualDiff: (v1, v2) ->

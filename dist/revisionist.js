@@ -277,8 +277,8 @@ Revisionist = (function() {
     min = Math.min(v1, v2);
     max = Math.max(v1, v2);
     return {
-      old: this.recover(min),
-      "new": this.recover(max)
+      old: _store.get(min),
+      "new": _store.get(max)
     };
   };
 
