@@ -37,7 +37,7 @@ module.exports = (grunt) ->
       tasks: ['default']
 
     coffeelint:
-      files: ['Gruntfile.coffee', 'src/*.coffee']
+      files: ['Gruntfile.coffee', 'src/**/*.coffee']
       options:
         max_line_length:
           level: 'ignore'
