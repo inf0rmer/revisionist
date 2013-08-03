@@ -136,6 +136,21 @@ module.exports = extend;
 
 
 },{}],3:[function(require,module,exports){
+var SimplePlugin;
+
+SimplePlugin = {
+  change: function(newValue) {
+    return newValue;
+  },
+  recover: function(prevValue) {
+    return prevValue;
+  }
+};
+
+module.exports = SimplePlugin;
+
+
+},{}],4:[function(require,module,exports){
 var Revisionist, SimplePlugin, extend, htmlDiff;
 
 htmlDiff = require('./lib/diff');
@@ -256,27 +271,21 @@ Revisionist = (function() {
 
   Revisionist.prototype.clear = function() {
     _cache = [];
-    return _currentVersion = 0;
+    _currentVersion = 0;
+    return this;
   };
 
   return Revisionist;
 
 })();
 
-SimplePlugin = {
-  change: function(newValue) {
-    return newValue;
-  },
-  recover: function(prevValue) {
-    return prevValue;
-  }
-};
+SimplePlugin = require('./plugins/simple.coffee');
 
 Revisionist.registerPlugin('simple', SimplePlugin);
 
 module.exports = Revisionist;
 
 
-},{"./lib/diff":1,"./lib/extend.coffee":2}]},{},[3])(3)
+},{"./lib/diff":1,"./lib/extend.coffee":2,"./plugins/simple.coffee":3}]},{},[4])(4)
 });
 ;
