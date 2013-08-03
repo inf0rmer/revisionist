@@ -48,6 +48,23 @@ define ['revisionist'], (Revisionist) ->
 
       Revisionist.unregisterPlugin 'incomplete'
 
+    it 'calls the store\'s "set" method with the new value and the new revision number as arguments', ->
+      class CustomStore
+        set: (value, version) ->
+
+        clear: ->
+
+      Revisionist.registerStore 'custom', CustomStore
+
+      rev = new Revisionist {store: 'custom'}
+      spy = spyOn CustomStore.prototype, 'set'
+
+      rev.change 'bacon'
+
+      expect(spy).toHaveBeenCalledWith('bacon', 1)
+
+      Revisionist.unregisterStore 'custom'
+
     it 'calls the plugin\'s "change" method with the new value as an argument', ->
       CustomPlugin =
         recover: ->
@@ -127,6 +144,24 @@ define ['revisionist'], (Revisionist) ->
 
       expect(-> rev.recover(99)).toThrow(e)
 
+    it 'calls the store\'s "get" method with the revision number as an argument', ->
+      class CustomStore
+        get: (version) ->
+          "bacon"
+
+        size: ->
+          1
+
+        clear: ->
+
+      Revisionist.registerStore 'custom', CustomStore
+
+      rev = new Revisionist {store: 'custom'}
+
+      expect( do rev.recover).toEqual('bacon')
+
+      Revisionist.unregisterStore 'custom'
+
     it 'calls the plugin\'s "recover" method with the revision value as an argument', ->
       CustomPlugin =
         recover: ->
@@ -190,7 +225,6 @@ define ['revisionist'], (Revisionist) ->
       rev.change 10
 
       diff = rev.diff(0, 2)
-      console.log diff
       expect(diff.old).toEqual(1)
       expect(diff.new).toEqual(10)
 
@@ -257,8 +291,45 @@ define ['revisionist'], (Revisionist) ->
 
       expect(latest).toEqual(2)
 
-  describe '.registerPlugin', ->
+  describe '#setStore', ->
 
+    it 'throws an Error if an non-existing store is set', ->
+      rev = new Revisionist
+      e = new Error("The Store 'bogus' is not available!")
+
+      expect(-> rev.setStore('bogus')).toThrow(e)
+
+    it 'calls the Store constructor with the Revisionist options hash as an argument', ->
+      opts = null
+      done = false
+
+      class CustomStore
+        constructor: (options) ->
+          opts = options
+          done = true
+
+      Revisionist.registerStore 'custom', CustomStore
+
+      rev = new Revisionist
+      rev.setStore('custom')
+      expect(done).toBeTruthy()
+      expect(opts).toEqual(rev.options)
+
+      Revisionist.unregisterStore 'custom', CustomStore
+
+  describe '.registerPlugin', ->
     it "exposes the registerPlugin method as a Class method", ->
       expect(Revisionist.registerPlugin).toEqual(jasmine.any(Function))
+
+  describe '.registerStore', ->
+    it "exposes the registerStore method as a Class method", ->
+      expect(Revisionist.registerStore).toEqual(jasmine.any(Function))
+
+    it "throws an Error if a namespace is already taken", ->
+      e = new Error("There's already a store in this namespace")
+      expect(-> Revisionist.registerStore('simple')).toThrow(e)
+
+  describe '.unregisterStore', ->
+    it "exposes the unregisterStore method as a Class method", ->
+      expect(Revisionist.unregisterStore).toEqual(jasmine.any(Function))
 

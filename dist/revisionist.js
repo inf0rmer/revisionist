@@ -151,20 +151,22 @@ module.exports = SimplePlugin;
 
 
 },{}],4:[function(require,module,exports){
-var Revisionist, SimplePlugin, extend, htmlDiff;
+var Revisionist, SimplePlugin, SimpleStore, extend, htmlDiff;
 
 htmlDiff = require('./lib/diff');
 
 extend = require('./lib/extend.coffee');
 
 Revisionist = (function() {
-  var _cache, _currentVersion, _getPreviousVersion, _plugins;
-
-  _cache = [];
+  var _currentVersion, _getPreviousVersion, _plugins, _store, _stores;
 
   _plugins = {};
 
+  _stores = {};
+
   _currentVersion = 0;
+
+  _store = null;
 
   _getPreviousVersion = function() {
     var version;
@@ -183,25 +185,44 @@ Revisionist = (function() {
   };
 
   Revisionist.unregisterPlugin = function(namespace) {
-    if (_plugins[namespace] == null) {
-      throw new Error("This plugin doesn't exist");
-    }
     return _plugins[namespace] = null;
+  };
+
+  Revisionist.registerStore = function(namespace, Store) {
+    if (_stores[namespace] != null) {
+      throw new Error("There's already a store in this namespace");
+    }
+    return _stores[namespace] = Store;
+  };
+
+  Revisionist.unregisterStore = function(namespace) {
+    return _stores[namespace] = null;
   };
 
   Revisionist.prototype.defaults = {
     versions: 10,
-    plugin: 'simple'
+    plugin: 'simple',
+    store: 'simple'
   };
 
   function Revisionist(options) {
     this.options = {};
     extend(this.options, this.defaults);
     extend(this.options, options);
+    this.setStore(this.options.store);
   }
 
   Revisionist.prototype.getLatestVersionNumber = function() {
     return _currentVersion - 1;
+  };
+
+  Revisionist.prototype.setStore = function(store) {
+    var Store;
+    Store = _stores[store];
+    if (Store == null) {
+      throw new Error("The Store '" + store + "' is not available!");
+    }
+    return _store = new Store(this.options);
   };
 
   Revisionist.prototype.change = function(newValue) {
@@ -212,10 +233,10 @@ Revisionist = (function() {
     }
     newValue = plugin.change.call(plugin, newValue);
     _currentVersion += 1;
-    _cache.push(newValue);
+    _store.set(newValue, _currentVersion);
     if (_currentVersion > this.options.versions) {
-      _cache.shift();
-      _currentVersion = _cache.length;
+      _store.remove(0);
+      _currentVersion = _store.size();
     }
     return newValue;
   };
@@ -232,10 +253,10 @@ Revisionist = (function() {
     if (version < 0) {
       throw new Error("Version needs to be a positive number");
     }
-    if (version > _cache.length) {
+    if (version > _store.size()) {
       throw new Error("This version doesn't exist");
     }
-    return plugin.recover.call(plugin, _cache[version]);
+    return plugin.recover.call(plugin, _store.get(version));
   };
 
   Revisionist.prototype.diff = function(v1, v2) {
@@ -255,8 +276,8 @@ Revisionist = (function() {
     min = Math.min(v1, v2);
     max = Math.max(v1, v2);
     return {
-      old: this.recover(min),
-      "new": this.recover(max)
+      old: _store.get(min),
+      "new": _store.get(max)
     };
   };
 
@@ -270,7 +291,7 @@ Revisionist = (function() {
   };
 
   Revisionist.prototype.clear = function() {
-    _cache = [];
+    _store.clear();
     _currentVersion = 0;
     return this;
   };
@@ -283,9 +304,52 @@ SimplePlugin = require('./plugins/simple.coffee');
 
 Revisionist.registerPlugin('simple', SimplePlugin);
 
+SimpleStore = require('./stores/simple.coffee');
+
+Revisionist.registerStore('simple', SimpleStore);
+
 module.exports = Revisionist;
 
 
-},{"./lib/diff":1,"./lib/extend.coffee":2,"./plugins/simple.coffee":3}]},{},[4])(4)
+},{"./lib/diff":1,"./lib/extend.coffee":2,"./plugins/simple.coffee":3,"./stores/simple.coffee":5}],5:[function(require,module,exports){
+var SimpleStore;
+
+SimpleStore = (function() {
+  var _cache;
+
+  _cache = [];
+
+  function SimpleStore(options) {
+    this.options = options;
+  }
+
+  SimpleStore.prototype.set = function(value, version) {
+    return _cache.push(value);
+  };
+
+  SimpleStore.prototype.get = function(version) {
+    return _cache[version];
+  };
+
+  SimpleStore.prototype.remove = function(version) {
+    return _cache.splice(version, 1);
+  };
+
+  SimpleStore.prototype.clear = function() {
+    return _cache = [];
+  };
+
+  SimpleStore.prototype.size = function() {
+    return _cache.length;
+  };
+
+  return SimpleStore;
+
+})();
+
+module.exports = SimpleStore;
+
+
+},{}]},{},[4])(4)
 });
 ;
