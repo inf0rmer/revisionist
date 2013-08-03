@@ -155,18 +155,10 @@ class Revisionist
     # Chain 'this' through
     return @
 
-# ## Simple Plugin
-#
-# This is a reference implementation for a plugin.
-# It simply stores the values as they are passed in.
-SimplePlugin =
-  change: (newValue) ->
-    return newValue
+# Simple Plugin, a reference implementation of a Revisionist plugin
+SimplePlugin = require('./plugins/simple.coffee')
 
-  recover: (prevValue) ->
-    return prevValue
-
-# Registers the SimplePlugin
+# Registers SimplePlugin
 Revisionist.registerPlugin('simple', SimplePlugin)
 
 module.exports = Revisionist
