@@ -165,3 +165,97 @@ Example:
 Revisionist.unregisterPlugin('myPlugin')
 // MyPlugin is not available anymore
 ```
+
+# Store Architecture
+Revisionist uses a store architecture, so if you require more advanced storage functions (ie. localStorage, Redis, etc) you can write your own Store class.
+
+The "Simple" store shipped by default stores the values using an in-memory cache in the form of an array.
+
+## Authoring a Store
+To write a store, you need to provide Revisionist with a Function with certain public API methods (plus anything else you might want).
+
+### Defining the Store constructor
+
+Using CoffeeScript:
+```coffeescript
+
+class MyStore
+  constructor: (options) ->
+    # Initialize here...
+
+  set: (value, version) ->
+    # Your implementation of "set"...
+
+  myMethod: ->
+    # Your implementation of "myMethod"...
+
+```
+
+Using Javascript:
+```javascript
+
+function MyStore(options) {
+  // Initialize here...
+}
+
+MyStore.prototype.set = function(value, version) {
+  // Your implementation of "set"...
+};
+
+MyStore.prototype.myMethod = function() {
+  // Your implementation of "myMethod"...
+};
+
+```
+
+The function constructor automatically receives the Revisionist instance options hash as an argument.
+
+### Store API
+
+**set (value, version)**
+
+Stores a new version. The value is user-supplied and the version number is an Integer supplied by Revisionist stating which version number should be saved.
+
+**get (version)**
+
+Retrieves the value for a specific version. The version number is an Integer supplied by Revisionist. It is already clamped to minimize chances that the version number is invalid.
+
+**remove (version)**
+
+Removes a version from the Store. This is typically called by Revisionist automatically when the Store's size reaches the maximum number of versions allowed.
+
+**clear**
+
+Fully empties the Store.
+
+**size**
+
+This should return an Integer containing the current size of the Store.
+
+### Registering and Unregistering a Store
+The ```Revisionist``` class exposes a class method to register your stores.
+
+**registerStore(name, Store)**
+
+Registers a store with a name and a constructor that follows the Store API. If your store does not implement these API methods, it will not work properly.
+
+Example:
+```javascript
+var MyStore = function(options){
+  //...
+}
+MyStore.prototype.get = function() {}
+...
+
+Revisionist.registerStore('myStore', MyStore);
+```
+
+**unregisterStore(name)**
+
+Unregisters a store with a given name.
+
+Example:
+```javascript
+Revisionist.unregisterStore('myStore')
+// MyStore is not available anymore
+```
