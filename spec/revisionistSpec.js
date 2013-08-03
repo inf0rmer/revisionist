@@ -290,9 +290,26 @@
         return expect(latest).toEqual(2);
       });
     });
-    return describe('.registerPlugin', function() {
+    describe('.registerPlugin', function() {
       return it("exposes the registerPlugin method as a Class method", function() {
         return expect(Revisionist.registerPlugin).toEqual(jasmine.any(Function));
+      });
+    });
+    describe('.registerStore', function() {
+      it("exposes the registerStore method as a Class method", function() {
+        return expect(Revisionist.registerStore).toEqual(jasmine.any(Function));
+      });
+      return it("throws an Error if a namespace is already taken", function() {
+        var e;
+        e = new Error("There's already a store in this namespace");
+        return expect(function() {
+          return Revisionist.registerStore('simple');
+        }).toThrow(e);
+      });
+    });
+    return describe('.unregisterStore', function() {
+      return it("exposes the unregisterStore method as a Class method", function() {
+        return expect(Revisionist.unregisterStore).toEqual(jasmine.any(Function));
       });
     });
   });

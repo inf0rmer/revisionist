@@ -258,7 +258,18 @@ define ['revisionist'], (Revisionist) ->
       expect(latest).toEqual(2)
 
   describe '.registerPlugin', ->
-
     it "exposes the registerPlugin method as a Class method", ->
       expect(Revisionist.registerPlugin).toEqual(jasmine.any(Function))
+
+  describe '.registerStore', ->
+    it "exposes the registerStore method as a Class method", ->
+      expect(Revisionist.registerStore).toEqual(jasmine.any(Function))
+
+    it "throws an Error if a namespace is already taken", ->
+      e = new Error("There's already a store in this namespace")
+      expect(-> Revisionist.registerStore('simple')).toThrow(e)
+
+  describe '.unregisterStore', ->
+    it "exposes the unregisterStore method as a Class method", ->
+      expect(Revisionist.unregisterStore).toEqual(jasmine.any(Function))
 
