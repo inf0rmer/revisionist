@@ -41,9 +41,6 @@ class Revisionist
 
   # This class method unregisters an existing plugin
   @unregisterPlugin: (namespace) ->
-    unless _plugins[namespace]?
-      throw new Error("This plugin doesn't exist")
-
     _plugins[namespace] = null
 
   # This class method lets you register a new store
@@ -56,9 +53,6 @@ class Revisionist
 
   # This class method unregisters an existing store
   @unregisterStore: (namespace) ->
-    unless _stores[namespace]?
-      throw new Error("This store doesn't exist")
-
     _stores[namespace] = null
 
   # The default options:

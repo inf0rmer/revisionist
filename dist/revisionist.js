@@ -185,9 +185,6 @@ Revisionist = (function() {
   };
 
   Revisionist.unregisterPlugin = function(namespace) {
-    if (_plugins[namespace] == null) {
-      throw new Error("This plugin doesn't exist");
-    }
     return _plugins[namespace] = null;
   };
 
@@ -199,9 +196,6 @@ Revisionist = (function() {
   };
 
   Revisionist.unregisterStore = function(namespace) {
-    if (_stores[namespace] == null) {
-      throw new Error("This store doesn't exist");
-    }
     return _stores[namespace] = null;
   };
 
