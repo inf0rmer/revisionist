@@ -10,14 +10,17 @@ extend = require('./lib/extend.coffee')
 #
 # The main public Class. When you create an instance of Revisionist, this is the public API you get back.
 class Revisionist
-  # The internal cache
-  _cache = []
-
   # The plugin registry
   _plugins = {}
 
+  # The store registry
+  _stores = {}
+
   # The version pointer
   _currentVersion = 0
+
+  # The internal store
+  _store = null
 
   # Helper function for getting the previous version of the current one.
   _getPreviousVersion = ->
@@ -43,6 +46,21 @@ class Revisionist
 
     _plugins[namespace] = null
 
+  # This class method lets you register a new store
+  @registerStore: (namespace, Store) ->
+    # Do not register the store if one with the same namespace already exists
+    if _stores[namespace]?
+      throw new Error("There's already a store in this namespace")
+
+    _stores[namespace] = Store
+
+  # This class method unregisters an existing store
+  @unregisterStore: (namespace) ->
+    unless _stores[namespace]?
+      throw new Error("This store doesn't exist")
+
+    _stores[namespace] = null
+
   # The default options:
   #
   # **versions**:
@@ -54,16 +72,34 @@ class Revisionist
   defaults:
     versions: 10
     plugin: 'simple'
+    store: 'simple'
 
   # The main constructor function that gets called when Revisionist is instantiated.
   constructor: (options) ->
+    # Configures options
     @options = {}
     extend @options, @defaults
     extend @options, options
 
+    # Configure store
+    @setStore(@options.store)
+
   # Implements a getter for _currentVersion
   getLatestVersionNumber: ->
     _currentVersion-1
+
+  # Sets the internal store
+  setStore: (store) ->
+    # Bail if the chosen store is not available in the store registry
+    Store = _stores[store]
+    unless Store?
+      throw new Error("The Store '#{Store}' is not available!")
+
+    # Construct the Store
+    _store = new Store(@options)
+
+    # Call the store's "initialize" method if it exists
+    _store.initialize?()
 
   # Adds a new revision for this instance.
   change: (newValue) ->
@@ -79,15 +115,15 @@ class Revisionist
     # Bump the current version number
     _currentVersion += 1
 
-    # Store the new version
-    _cache.push(newValue)
+    # Save the new version
+    _store.set(newValue, _currentVersion)
 
     # Keep the internal cache trimmed according to the "versions" option.
     if _currentVersion > @options.versions
       # Remove the oldest version
-      _cache.shift()
+      _store.remove(0)
       # Keep the _currentVersion pointer
-      _currentVersion = _cache.length
+      _currentVersion = _store.size()
 
     return newValue
 
@@ -107,11 +143,11 @@ class Revisionist
     if version < 0
       throw new Error("Version needs to be a positive number")
 
-    if version > _cache.length
+    if version > _store.size()
       throw new Error("This version doesn't exist")
 
     # Call the plugin's "recover" function and return it's return value.
-    plugin.recover.call(plugin, _cache[version])
+    plugin.recover.call(plugin, _store.get(version))
 
   # Represents the difference between two versions.
   diff: (v1, v2) ->
@@ -147,8 +183,8 @@ class Revisionist
 
   # Clears the cache
   clear: ->
-    # Reset the internal cache
-    _cache = []
+    # Reset the store
+    _store.clear()
     # Reset the version pointer
     _currentVersion = 0
 
@@ -160,5 +196,11 @@ SimplePlugin = require('./plugins/simple.coffee')
 
 # Registers SimplePlugin
 Revisionist.registerPlugin('simple', SimplePlugin)
+
+# Simple Store, a reference implementation of a Revisionist Store
+SimpleStore = require('./stores/simple.coffee')
+
+# Registers SimpleStore
+Revisionist.registerStore('simple', SimpleStore)
 
 module.exports = Revisionist

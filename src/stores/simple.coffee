@@ -15,4 +15,7 @@ class SimpleStore
   clear: ->
     _cache = []
 
+  size: ->
+    _cache.length
+
 module.exports = SimpleStore
