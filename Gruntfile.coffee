@@ -26,6 +26,7 @@ module.exports = (grunt) ->
               ' * <%= pkg.homepage %>\n' +
               ' *\n' +
               ' */\n'
+        report: 'gzip'
         mangle:
           except: ['Revisionist']
       browser:
