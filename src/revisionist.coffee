@@ -119,7 +119,7 @@ class Revisionist
     return newValue
 
   # Recovers a specific revision from the cache
-  recover: (version) ->
+  recover: (version, callback) ->
     # Check if the plugin is available
     plugin = _plugins[@options.plugin]
 
@@ -138,10 +138,17 @@ class Revisionist
       throw new Error("This version doesn't exist")
 
     # Call the plugin's "recover" function and return it's return value.
-    plugin.recover.call(plugin, _store.get(version))
+    # plugin.recover.call(plugin, _store.get(version))
+
+    # Call the plugin's "recover" function and return it using the callback
+    if typeof callback is 'function'
+      _store.get(version, (data) ->
+        # Pipe the data through from the plugin to the callback
+        callback(plugin.recover.call(plugin, data))
+      )
 
   # Represents the difference between two versions.
-  diff: (v1, v2) ->
+  diff: (v1, v2, callback) ->
     # If no v1 is passed in, the current version is assumed
     unless v1?
       v1 = _currentVersion - 1
@@ -157,20 +164,22 @@ class Revisionist
     max = Math.max(v1, v2)
 
     # Returns the diff hash
-    return {
-      old: _store.get(min)
-      new: _store.get(max)
-    }
+    if typeof callback is 'function'
+      _store.get(min, (old) ->
+        _store.get(max, (n) ->
+          callback {old: old, new: n}
+        )
+      )
 
-  visualDiff: (v1, v2) ->
+  visualDiff: (v1, v2, callback) ->
     # Pipes diff() into the htmlDiff() module
-    diff = @diff(v1, v2)
+    @diff(v1, v2, (diff) ->
+      # Bail out if both versions are not Strings
+      unless typeof diff.old is 'string' and typeof diff.new is 'string'
+        throw new Error('The content types of both versions must match')
 
-    # Bail out if both versions are not Strings
-    unless typeof diff.old is 'string' and typeof diff.new is 'string'
-      throw new Error('The content types of both versions must match')
-
-    return htmlDiff diff.old, diff.new
+      callback( htmlDiff(diff.old, diff.new) )
+    )
 
   # Clears the cache
   clear: ->

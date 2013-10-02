@@ -6,8 +6,8 @@ class SimpleStore
   set: (value, version) ->
     _cache.push(value)
 
-  get: (version) ->
-    _cache[version]
+  get: (version, callback) ->
+    callback _cache[version]
 
   remove: (version) ->
     _cache.splice(version, 1)

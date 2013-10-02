@@ -241,7 +241,7 @@ Revisionist = (function() {
     return newValue;
   };
 
-  Revisionist.prototype.recover = function(version) {
+  Revisionist.prototype.recover = function(version, callback) {
     var plugin;
     plugin = _plugins[this.options.plugin];
     if ((plugin != null ? plugin.recover : void 0) == null) {
@@ -256,10 +256,14 @@ Revisionist = (function() {
     if (version > _store.size()) {
       throw new Error("This version doesn't exist");
     }
-    return plugin.recover.call(plugin, _store.get(version));
+    if (typeof callback === 'function') {
+      return _store.get(version, function(data) {
+        return callback(plugin.recover.call(plugin, data));
+      });
+    }
   };
 
-  Revisionist.prototype.diff = function(v1, v2) {
+  Revisionist.prototype.diff = function(v1, v2, callback) {
     var max, min;
     if (v1 == null) {
       v1 = _currentVersion - 1;
@@ -275,19 +279,25 @@ Revisionist = (function() {
     }
     min = Math.min(v1, v2);
     max = Math.max(v1, v2);
-    return {
-      old: _store.get(min),
-      "new": _store.get(max)
-    };
+    if (typeof callback === 'function') {
+      return _store.get(min, function(old) {
+        return _store.get(max, function(n) {
+          return callback({
+            old: old,
+            "new": n
+          });
+        });
+      });
+    }
   };
 
-  Revisionist.prototype.visualDiff = function(v1, v2) {
-    var diff;
-    diff = this.diff(v1, v2);
-    if (!(typeof diff.old === 'string' && typeof diff["new"] === 'string')) {
-      throw new Error('The content types of both versions must match');
-    }
-    return htmlDiff(diff.old, diff["new"]);
+  Revisionist.prototype.visualDiff = function(v1, v2, callback) {
+    return this.diff(v1, v2, function(diff) {
+      if (!(typeof diff.old === 'string' && typeof diff["new"] === 'string')) {
+        throw new Error('The content types of both versions must match');
+      }
+      return callback(htmlDiff(diff.old, diff["new"]));
+    });
   };
 
   Revisionist.prototype.clear = function() {
@@ -327,8 +337,8 @@ SimpleStore = (function() {
     return _cache.push(value);
   };
 
-  SimpleStore.prototype.get = function(version) {
-    return _cache[version];
+  SimpleStore.prototype.get = function(version, callback) {
+    return callback(_cache[version]);
   };
 
   SimpleStore.prototype.remove = function(version) {
