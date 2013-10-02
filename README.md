@@ -222,9 +222,9 @@ The function constructor automatically receives the Revisionist instance options
 
 Stores a new version. The value is user-supplied and the version number is an Integer supplied by Revisionist stating which version number should be saved.
 
-**get (version)**
+**get (version, callback)**
 
-Retrieves the value for a specific version. The version number is an Integer supplied by Revisionist. It is already clamped to minimize chances that the version number is invalid.
+Retrieves the value for a specific version and executes the callback with it as an argument. The version number is an Integer supplied by Revisionist. It is already clamped to minimize chances that the version number is invalid.
 
 **remove (version)**
 
