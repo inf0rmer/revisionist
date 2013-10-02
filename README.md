@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/inf0rmer/revisionist.png?branch=master)](https://travis-ci.org/inf0rmer/revisionist)
+
 # Overview
 Revisionist is a simple tool to help you manage versions of content in your web application.
 Everytime your data changes, you can save it as a revision in a Revisionist instance.
