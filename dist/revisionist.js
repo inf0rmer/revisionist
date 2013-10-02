@@ -139,7 +139,7 @@ module.exports = extend;
 var SimplePlugin;
 
 SimplePlugin = {
-  change: function(newValue) {
+  update: function(newValue) {
     return newValue;
   },
   recover: function(prevValue) {
@@ -225,13 +225,13 @@ Revisionist = (function() {
     return _store = new Store(this.options);
   };
 
-  Revisionist.prototype.change = function(newValue) {
+  Revisionist.prototype.update = function(newValue) {
     var plugin;
     plugin = _plugins[this.options.plugin];
-    if ((plugin != null ? plugin.change : void 0) == null) {
+    if ((plugin != null ? plugin.update : void 0) == null) {
       throw new Error("Plugin " + this.options.plugin + " is not available!");
     }
-    newValue = plugin.change.call(plugin, newValue);
+    newValue = plugin.update.call(plugin, newValue);
     _currentVersion += 1;
     _store.set(newValue, _currentVersion);
     if (_currentVersion > this.options.versions) {

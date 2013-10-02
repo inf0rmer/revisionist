@@ -93,15 +93,15 @@ class Revisionist
     _store = new Store(@options)
 
   # Adds a new revision for this instance.
-  change: (newValue) ->
+  update: (newValue) ->
     # Check if the plugin is available
     plugin = _plugins[@options.plugin]
 
-    unless plugin?.change?
+    unless plugin?.update?
       throw new Error("Plugin #{@options.plugin} is not available!")
 
-    # Call the plugin's "change" function and get it's return value for storing.
-    newValue = plugin.change.call(plugin, newValue)
+    # Call the plugin's "update" function and get it's return value for storing.
+    newValue = plugin.update.call(plugin, newValue)
 
     # Bump the current version number
     _currentVersion += 1

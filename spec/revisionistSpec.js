@@ -29,7 +29,7 @@
         return expect(rev.options.plugin).toBe('complex');
       });
     });
-    describe('#change', function() {
+    describe('#update', function() {
       var rev;
       rev = null;
       afterEach(function() {
@@ -45,10 +45,10 @@
         });
         e = new Error("Plugin unexistant is not available!");
         return expect(function() {
-          return rev.change('bananas');
+          return rev.update('bananas');
         }).toThrow(e);
       });
-      it('throws an Error if the plugin doesn\'t have a "change" method', function() {
+      it('throws an Error if the plugin doesn\'t have a "update" method', function() {
         var e;
         Revisionist.registerPlugin('incomplete', {
           recover: function() {},
@@ -59,7 +59,7 @@
         });
         e = new Error("Plugin incomplete is not available!");
         expect(function() {
-          return rev.change('bananas');
+          return rev.update('bananas');
         }).toThrow(e);
         return Revisionist.unregisterPlugin('incomplete');
       });
@@ -80,30 +80,30 @@
           store: 'custom'
         });
         spy = spyOn(CustomStore.prototype, 'set');
-        rev.change('bacon');
+        rev.update('bacon');
         expect(spy).toHaveBeenCalledWith('bacon', 1);
         return Revisionist.unregisterStore('custom');
       });
-      it('calls the plugin\'s "change" method with the new value as an argument', function() {
+      it('calls the plugin\'s "update" method with the new value as an argument', function() {
         var CustomPlugin, spy;
         CustomPlugin = {
           recover: function() {},
-          change: function() {}
+          update: function() {}
         };
-        spy = spyOn(CustomPlugin, 'change');
+        spy = spyOn(CustomPlugin, 'update');
         Revisionist.registerPlugin('custom', CustomPlugin);
         rev = new Revisionist({
           plugin: 'custom'
         });
-        rev.change('bacon');
+        rev.update('bacon');
         expect(spy).toHaveBeenCalledWith('bacon');
         return Revisionist.unregisterPlugin('custom');
       });
-      it('calls the plugin\'s "change" method within it\'s own context', function() {
+      it('calls the plugin\'s "update" method within it\'s own context', function() {
         var CustomPlugin, spy;
         CustomPlugin = {
           recover: function() {},
-          change: function() {
+          update: function() {
             return this.ownFunction();
           },
           ownFunction: function() {}
@@ -113,7 +113,7 @@
         rev = new Revisionist({
           plugin: 'custom'
         });
-        rev.change('pancakes');
+        rev.update('pancakes');
         expect(spy).toHaveBeenCalled();
         return Revisionist.unregisterPlugin('custom');
       });
@@ -122,9 +122,9 @@
         rev = new Revisionist({
           versions: 2
         });
-        rev.change('bananas');
-        rev.change('bacon');
-        rev.change('pineapples');
+        rev.update('bananas');
+        rev.update('bacon');
+        rev.update('pineapples');
         recovered = false;
         rev.recover(0, function(data) {
           return recovered = data;
@@ -156,11 +156,11 @@
           return rev.recover(0);
         }).toThrow(e);
       });
-      it('throws an Error if the plugin doesn\'t have a "change" method', function() {
+      it('throws an Error if the plugin doesn\'t have a "update" method', function() {
         var e;
         Revisionist.registerPlugin('incomplete2', {
           notRecover: function() {},
-          change: function() {}
+          update: function() {}
         });
         rev = new Revisionist({
           plugin: 'incomplete'
@@ -224,7 +224,7 @@
         var CustomPlugin, spy;
         CustomPlugin = {
           recover: function() {},
-          change: function(value) {
+          update: function(value) {
             return value;
           }
         };
@@ -233,7 +233,7 @@
         rev = new Revisionist({
           plugin: 'custom'
         });
-        rev.change('bacon');
+        rev.update('bacon');
         rev.recover(0, function() {});
         expect(spy).toHaveBeenCalledWith('bacon');
         return Revisionist.unregisterPlugin('custom');
@@ -244,7 +244,7 @@
           recover: function() {
             return this.ownFunction();
           },
-          change: function() {},
+          update: function() {},
           ownFunction: function() {}
         };
         spy = spyOn(CustomPlugin, 'ownFunction');
@@ -252,7 +252,7 @@
         rev = new Revisionist({
           plugin: 'custom'
         });
-        rev.change('pancakes');
+        rev.update('pancakes');
         rev.recover(0, function() {});
         expect(spy).toHaveBeenCalled();
         return Revisionist.unregisterPlugin('custom');
@@ -260,9 +260,9 @@
       return it('defaults to the version prior to the current one', function() {
         var recovered;
         rev = new Revisionist;
-        rev.change('bacon');
-        rev.change('bananas');
-        rev.change('oranges');
+        rev.update('bacon');
+        rev.update('bananas');
+        rev.update('oranges');
         recovered = false;
         rev.recover(null, function(data) {
           return recovered = data;
@@ -285,9 +285,9 @@
       });
       it('returns a diff hash with old and new keys', function() {
         var diff;
-        rev.change(1);
-        rev.change(3);
-        rev.change(10);
+        rev.update(1);
+        rev.update(3);
+        rev.update(10);
         diff = null;
         waitsFor(function() {
           return diff;
@@ -302,9 +302,9 @@
       });
       it('compares the two most recent versions if no parameters are passed in', function() {
         var diff;
-        rev.change(1);
-        rev.change(3);
-        rev.change(10);
+        rev.update(1);
+        rev.update(3);
+        rev.update(10);
         diff = null;
         waitsFor(function() {
           return diff;
@@ -319,9 +319,9 @@
       });
       return it('compares the passed in version against the version before it if only one parameter is passed in', function() {
         var diff;
-        rev.change(1);
-        rev.change(3);
-        rev.change(10);
+        rev.update(1);
+        rev.update(3);
+        rev.update(10);
         diff = null;
         waitsFor(function() {
           return diff;
@@ -347,8 +347,8 @@
       });
       it('throws an Error if the content types are not both String', function() {
         var e;
-        rev.change('string');
-        rev.change(2);
+        rev.update('string');
+        rev.update(2);
         e = new Error('The content types of both versions must match');
         return expect(function() {
           return rev.visualDiff();
@@ -356,8 +356,8 @@
       });
       return it('returns an HTML annotated diff for String values', function() {
         var diff, expectedDiff;
-        rev.change('fox');
-        rev.change('the brown fox jumped over the lazy wizard');
+        rev.update('fox');
+        rev.update('the brown fox jumped over the lazy wizard');
         expectedDiff = '<ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>';
         diff = null;
         rev.visualDiff(null, null, function(data) {
@@ -383,9 +383,9 @@
       return it("exposes the latest version number", function() {
         var latest;
         rev = new Revisionist;
-        rev.change(1);
-        rev.change(2);
-        rev.change(3);
+        rev.update(1);
+        rev.update(2);
+        rev.update(3);
         latest = rev.getLatestVersionNumber();
         return expect(latest).toEqual(2);
       });

@@ -23,7 +23,7 @@ define ['revisionist'], (Revisionist) ->
       expect(rev.options.versions).toBe(20)
       expect(rev.options.plugin).toBe('complex')
 
-  describe '#change', ->
+  describe '#update', ->
     rev = null
     afterEach ->
       rev?.clear()
@@ -33,9 +33,9 @@ define ['revisionist'], (Revisionist) ->
       rev = new Revisionist {plugin: 'unexistant'}
       e = new Error("Plugin unexistant is not available!")
 
-      expect(-> rev.change('bananas')).toThrow(e)
+      expect(-> rev.update('bananas')).toThrow(e)
 
-    it 'throws an Error if the plugin doesn\'t have a "change" method', ->
+    it 'throws an Error if the plugin doesn\'t have a "update" method', ->
       Revisionist.registerPlugin 'incomplete', {
         recover: ->
         notChange: ->
@@ -44,7 +44,7 @@ define ['revisionist'], (Revisionist) ->
       rev = new Revisionist {plugin: 'incomplete'}
       e = new Error("Plugin incomplete is not available!")
 
-      expect(-> rev.change('bananas')).toThrow(e)
+      expect(-> rev.update('bananas')).toThrow(e)
 
       Revisionist.unregisterPlugin 'incomplete'
 
@@ -59,32 +59,32 @@ define ['revisionist'], (Revisionist) ->
       rev = new Revisionist {store: 'custom'}
       spy = spyOn CustomStore.prototype, 'set'
 
-      rev.change 'bacon'
+      rev.update 'bacon'
 
       expect(spy).toHaveBeenCalledWith('bacon', 1)
 
       Revisionist.unregisterStore 'custom'
 
-    it 'calls the plugin\'s "change" method with the new value as an argument', ->
+    it 'calls the plugin\'s "update" method with the new value as an argument', ->
       CustomPlugin =
         recover: ->
-        change: ->
+        update: ->
 
-      spy = spyOn CustomPlugin, 'change'
+      spy = spyOn CustomPlugin, 'update'
 
       Revisionist.registerPlugin 'custom', CustomPlugin
 
       rev = new Revisionist {plugin: 'custom'}
-      rev.change('bacon')
+      rev.update('bacon')
 
       expect(spy).toHaveBeenCalledWith('bacon')
 
       Revisionist.unregisterPlugin 'custom'
 
-    it 'calls the plugin\'s "change" method within it\'s own context', ->
+    it 'calls the plugin\'s "update" method within it\'s own context', ->
       CustomPlugin =
         recover: ->
-        change: ->
+        update: ->
           @ownFunction()
         ownFunction: ->
 
@@ -93,7 +93,7 @@ define ['revisionist'], (Revisionist) ->
       Revisionist.registerPlugin 'custom', CustomPlugin
 
       rev = new Revisionist {plugin: 'custom'}
-      rev.change('pancakes')
+      rev.update('pancakes')
 
       expect(spy).toHaveBeenCalled()
 
@@ -102,9 +102,9 @@ define ['revisionist'], (Revisionist) ->
     it 'only keeps a limited amount of versions', ->
       rev = new Revisionist {versions: 2}
 
-      rev.change('bananas')
-      rev.change('bacon')
-      rev.change('pineapples')
+      rev.update('bananas')
+      rev.update('bacon')
+      rev.update('pineapples')
 
       recovered = false
 
@@ -129,10 +129,10 @@ define ['revisionist'], (Revisionist) ->
 
       expect(-> rev.recover(0)).toThrow(e)
 
-    it 'throws an Error if the plugin doesn\'t have a "change" method', ->
+    it 'throws an Error if the plugin doesn\'t have a "update" method', ->
       Revisionist.registerPlugin 'incomplete2', {
         notRecover: ->
-        change: ->
+        update: ->
       }
 
       rev = new Revisionist {plugin: 'incomplete'}
@@ -182,7 +182,7 @@ define ['revisionist'], (Revisionist) ->
     it 'calls the plugin\'s "recover" method with the revision value as an argument', ->
       CustomPlugin =
         recover: ->
-        change: (value)->
+        update: (value)->
           value
 
       spy = spyOn CustomPlugin, 'recover'
@@ -190,7 +190,7 @@ define ['revisionist'], (Revisionist) ->
       Revisionist.registerPlugin 'custom', CustomPlugin
 
       rev = new Revisionist {plugin: 'custom'}
-      rev.change('bacon')
+      rev.update('bacon')
       rev.recover(0, ->)
 
       expect(spy).toHaveBeenCalledWith('bacon')
@@ -201,7 +201,7 @@ define ['revisionist'], (Revisionist) ->
       CustomPlugin =
         recover: ->
           @ownFunction()
-        change: ->
+        update: ->
         ownFunction: ->
 
       spy = spyOn CustomPlugin, 'ownFunction'
@@ -209,7 +209,7 @@ define ['revisionist'], (Revisionist) ->
       Revisionist.registerPlugin 'custom', CustomPlugin
 
       rev = new Revisionist {plugin: 'custom'}
-      rev.change('pancakes')
+      rev.update('pancakes')
       rev.recover(0, ->)
 
       expect(spy).toHaveBeenCalled()
@@ -218,9 +218,9 @@ define ['revisionist'], (Revisionist) ->
 
     it 'defaults to the version prior to the current one', ->
       rev = new Revisionist
-      rev.change('bacon')
-      rev.change('bananas')
-      rev.change('oranges')
+      rev.update('bacon')
+      rev.update('bananas')
+      rev.update('oranges')
 
       recovered = false
 
@@ -243,9 +243,9 @@ define ['revisionist'], (Revisionist) ->
       rev = null
 
     it 'returns a diff hash with old and new keys', ->
-      rev.change 1
-      rev.change 3
-      rev.change 10
+      rev.update 1
+      rev.update 3
+      rev.update 10
 
       diff = null
 
@@ -260,9 +260,9 @@ define ['revisionist'], (Revisionist) ->
         expect(diff.new).toEqual(10)
 
     it 'compares the two most recent versions if no parameters are passed in', ->
-      rev.change 1
-      rev.change 3
-      rev.change 10
+      rev.update 1
+      rev.update 3
+      rev.update 10
 
       diff = null
 
@@ -277,9 +277,9 @@ define ['revisionist'], (Revisionist) ->
         expect(diff.new).toEqual(10)
 
     it 'compares the passed in version against the version before it if only one parameter is passed in', ->
-      rev.change 1
-      rev.change 3
-      rev.change 10
+      rev.update 1
+      rev.update 3
+      rev.update 10
 
       diff = null
 
@@ -305,16 +305,16 @@ define ['revisionist'], (Revisionist) ->
       rev = null
 
     it 'throws an Error if the content types are not both String', ->
-      rev.change 'string'
-      rev.change 2
+      rev.update 'string'
+      rev.update 2
 
       e = new Error('The content types of both versions must match')
 
       expect( -> rev.visualDiff()).toThrow(e)
 
     it 'returns an HTML annotated diff for String values', ->
-      rev.change 'fox'
-      rev.change 'the brown fox jumped over the lazy wizard'
+      rev.update 'fox'
+      rev.update 'the brown fox jumped over the lazy wizard'
       expectedDiff = '<ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>'
 
       diff = null
@@ -336,9 +336,9 @@ define ['revisionist'], (Revisionist) ->
 
     it "exposes the latest version number", ->
       rev = new Revisionist
-      rev.change(1)
-      rev.change(2)
-      rev.change(3)
+      rev.update(1)
+      rev.update(2)
+      rev.update(3)
 
       latest = rev.getLatestVersionNumber()
 
