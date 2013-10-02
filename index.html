@@ -46,7 +46,9 @@
 
 
       <section id="main_content">
-        <h1>
+        <p><a href="https://travis-ci.org/inf0rmer/revisionist"><img src="https://travis-ci.org/inf0rmer/revisionist.png?branch=master" alt="Build Status"></a></p>
+
+<h1>
 <a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h1>
 
 <p>Revisionist is a simple tool to help you manage versions of content in your web application.
@@ -78,7 +80,7 @@ You can then access the last x versions of your content (10 by default).</p>
 
 <p>Include the script in your page. A global "Revisionist" variable will be made available.</p>
 
-<div class="highlight"><pre><span class="nx">rev</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">window</span><span class="p">.</span><span class="nx">Revisionist</span><span class="p">()</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">rev</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">window</span><span class="p">.</span><span class="nx">Revisionist</span><span class="p">()</span>
 </pre></div>
 
 <h2>
@@ -86,7 +88,7 @@ You can then access the last x versions of your content (10 by default).</p>
 
 <p>Using an AMD loader such as <a href="http://requirejs.org">RequireJS</a>:</p>
 
-<div class="highlight"><pre><span class="nx">require</span><span class="p">([</span><span class="s1">'path/to/revisionist'</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">Revisionist</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">require</span><span class="p">([</span><span class="s1">'path/to/revisionist'</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">Revisionist</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">rev</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Revisionist</span><span class="p">()</span>
 <span class="p">});</span>
 </pre></div>
@@ -94,7 +96,7 @@ You can then access the last x versions of your content (10 by default).</p>
 <h2>
 <a name="in-node" class="anchor" href="#in-node"><span class="octicon octicon-link"></span></a>In Node</h2>
 
-<div class="highlight"><pre><span class="nx">Revisionist</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path/to/revisionist'</span><span class="p">)</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">Revisionist</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path/to/revisionist'</span><span class="p">)</span>
 <span class="nx">rev</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Revisionist</span><span class="p">()</span>
 </pre></div>
 
@@ -107,54 +109,60 @@ You can then access the last x versions of your content (10 by default).</p>
 
 <p>Creates a new revision. It returns the same value you passed in</p>
 
-<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'bananas'</span><span class="p">)</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'bananas'</span><span class="p">)</span>
 <span class="c1">// -&gt; 'bananas'</span>
 </pre></div>
 
-<p><strong>recover(version)</strong></p>
+<p><strong>recover(version, callback)</strong></p>
 
-<p>Recovers a previous version of your content and returns it.</p>
+<p>Asynchronously recovers a previous version of your content.</p>
 
-<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'tomatoes'</span><span class="p">)</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'tomatoes'</span><span class="p">)</span>
 
-<span class="nx">rev</span><span class="p">.</span><span class="nx">recover</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="c1">// -&gt; 'bananas'</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">recover</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+  <span class="c1">// data === 'bananas'</span>
+<span class="p">})</span>
 
-<span class="nx">rev</span><span class="p">.</span><span class="nx">recover</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="c1">// -&gt; 'tomatoes'</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">recover</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+  <span class="c1">// data === 'tomatoes'</span>
+<span class="p">})</span>
 </pre></div>
 
-<p><strong>diff(version1, version2)</strong></p>
+<p><strong>diff(version1, version2, callback)</strong></p>
 
-<p>Presents the difference between two versions.
+<p>Asynchronously presents the difference between two versions.
 If no parameters are passed in, the two latest versions are assumed.
 If only the first parameter is passed, it is checked against the version before it.</p>
 
+<p>This function uses the Store's <code>get</code> methods directly instead of Revisionist's <code>recover</code>, so the Plugin's code will not run when calling <code>diff</code>.</p>
+
 <p>Calling diff returns a hash with two keys, <code>old</code> and <code>new</code>, containing the values for the oldest and newest versions passed in.</p>
 
-<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
-<span class="nx">rev</span><span class="p">.</span><span class="nx">diff</span><span class="p">()</span>
-<span class="c1">// -&gt; { old: 2, new: 10 }</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">diff</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hash</span><span class="p">){</span>
+  <span class="c1">// hash == { old: 2, new: 10 }</span>
+<span class="p">})</span>
 </pre></div>
 
-<p><strong>visualDiff(version1, version2)</strong></p>
+<p><strong>visualDiff(version1, version2, callback)</strong></p>
 
 <p>This function will produce an HTML annotated diff string. If any non-String values are detected, an Error will be thrown.</p>
 
-<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'fox'</span><span class="p">)</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'fox'</span><span class="p">)</span>
 <span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'the brown fox jumped over the lazy wizard'</span><span class="p">)</span>
 
-<span class="nx">rev</span><span class="p">.</span><span class="nx">visualDiff</span><span class="p">()</span>
-<span class="c1">// -&gt; &lt;ins&gt;the &lt;/ins&gt;&lt;ins&gt;brown &lt;/ins&gt; fox &lt;ins&gt;jumped &lt;/ins&gt;&lt;ins&gt;over &lt;/ins&gt;&lt;ins&gt;the &lt;/ins&gt;&lt;ins&gt;lazy &lt;/ins&gt;&lt;ins&gt;wizard\n&lt;/ins&gt;</span>
+<span class="nx">rev</span><span class="p">.</span><span class="nx">visualDiff</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">html</span><span class="p">){</span>
+  <span class="c1">// html === &lt;ins&gt;the &lt;/ins&gt;&lt;ins&gt;brown &lt;/ins&gt; fox &lt;ins&gt;jumped &lt;/ins&gt;&lt;ins&gt;over &lt;/ins&gt;&lt;ins&gt;the &lt;/ins&gt;&lt;ins&gt;lazy &lt;/ins&gt;&lt;ins&gt;wizard\n&lt;/ins&gt;</span>
+<span class="p">})</span>
 </pre></div>
 
 <p><strong>getLatestVersionNumber</strong></p>
 
 <p>Returns the index for the last saved version. The earliest version stored is always 0, so:</p>
 
-<div class="highlight"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'once'</span><span class="p">)</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'once'</span><span class="p">)</span>
 <span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'twice'</span><span class="p">)</span>
 <span class="nx">rev</span><span class="p">.</span><span class="nx">change</span><span class="p">(</span><span class="s1">'thrice'</span><span class="p">)</span>
 
@@ -212,7 +220,7 @@ If only the first parameter is passed, it is checked against the version before 
 
 <p>Example:</p>
 
-<div class="highlight"><pre><span class="nx">MyPlugin</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">MyPlugin</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">change</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">newValue</span><span class="p">)</span> <span class="p">{},</span>
   <span class="nx">recover</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oldValue</span><span class="p">)</span> <span class="p">{}</span>
 <span class="p">}</span>
@@ -226,8 +234,110 @@ If only the first parameter is passed, it is checked against the version before 
 
 <p>Example:</p>
 
-<div class="highlight"><pre><span class="nx">Revisionist</span><span class="p">.</span><span class="nx">unregisterPlugin</span><span class="p">(</span><span class="s1">'myPlugin'</span><span class="p">)</span>
+<div class="highlight highlight-javascript"><pre><span class="nx">Revisionist</span><span class="p">.</span><span class="nx">unregisterPlugin</span><span class="p">(</span><span class="s1">'myPlugin'</span><span class="p">)</span>
 <span class="c1">// MyPlugin is not available anymore</span>
+</pre></div>
+
+<h1>
+<a name="store-architecture" class="anchor" href="#store-architecture"><span class="octicon octicon-link"></span></a>Store Architecture</h1>
+
+<p>Revisionist uses a store architecture, so if you require more advanced storage functions (ie. localStorage, Redis, etc) you can write your own Store class.</p>
+
+<p>The "Simple" store shipped by default stores the values using an in-memory cache in the form of an array.</p>
+
+<h2>
+<a name="authoring-a-store" class="anchor" href="#authoring-a-store"><span class="octicon octicon-link"></span></a>Authoring a Store</h2>
+
+<p>To write a store, you need to provide Revisionist with a Function with certain public API methods (plus anything else you might want).</p>
+
+<h3>
+<a name="defining-the-store-constructor" class="anchor" href="#defining-the-store-constructor"><span class="octicon octicon-link"></span></a>Defining the Store constructor</h3>
+
+<p>Using CoffeeScript:</p>
+
+<div class="highlight highlight-coffeescript"><pre>
+<span class="k">class</span> <span class="nx">MyStore</span>
+  <span class="nv">constructor: </span><span class="nf">(options) -&gt;</span>
+    <span class="c1"># Initialize here...</span>
+
+  <span class="nv">set: </span><span class="nf">(value, version) -&gt;</span>
+    <span class="c1"># Your implementation of "set"...</span>
+
+  <span class="nv">myMethod: </span><span class="nf">-&gt;</span>
+    <span class="c1"># Your implementation of "myMethod"...</span>
+
+</pre></div>
+
+<p>Using Javascript:</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="kd">function</span> <span class="nx">MyStore</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Initialize here...</span>
+<span class="p">}</span>
+
+<span class="nx">MyStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">set</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">version</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Your implementation of "set"...</span>
+<span class="p">};</span>
+
+<span class="nx">MyStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">myMethod</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Your implementation of "myMethod"...</span>
+<span class="p">};</span>
+
+</pre></div>
+
+<p>The function constructor automatically receives the Revisionist instance options hash as an argument.</p>
+
+<h3>
+<a name="store-api" class="anchor" href="#store-api"><span class="octicon octicon-link"></span></a>Store API</h3>
+
+<p><strong>set (value, version)</strong></p>
+
+<p>Stores a new version. The value is user-supplied and the version number is an Integer supplied by Revisionist stating which version number should be saved.</p>
+
+<p><strong>get (version)</strong></p>
+
+<p>Retrieves the value for a specific version. The version number is an Integer supplied by Revisionist. It is already clamped to minimize chances that the version number is invalid.</p>
+
+<p><strong>remove (version)</strong></p>
+
+<p>Removes a version from the Store. This is typically called by Revisionist automatically when the Store's size reaches the maximum number of versions allowed.</p>
+
+<p><strong>clear</strong></p>
+
+<p>Fully empties the Store.</p>
+
+<p><strong>size</strong></p>
+
+<p>This should return an Integer containing the current size of the Store.</p>
+
+<h3>
+<a name="registering-and-unregistering-a-store" class="anchor" href="#registering-and-unregistering-a-store"><span class="octicon octicon-link"></span></a>Registering and Unregistering a Store</h3>
+
+<p>The <code>Revisionist</code> class exposes a class method to register your stores.</p>
+
+<p><strong>registerStore(name, Store)</strong></p>
+
+<p>Registers a store with a name and a constructor that follows the Store API. If your store does not implement these API methods, it will not work properly.</p>
+
+<p>Example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">MyStore</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">){</span>
+  <span class="c1">//...</span>
+<span class="p">}</span>
+<span class="nx">MyStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">get</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+<span class="p">...</span>
+
+<span class="nx">Revisionist</span><span class="p">.</span><span class="nx">registerStore</span><span class="p">(</span><span class="s1">'myStore'</span><span class="p">,</span> <span class="nx">MyStore</span><span class="p">);</span>
+</pre></div>
+
+<p><strong>unregisterStore(name)</strong></p>
+
+<p>Unregisters a store with a given name.</p>
+
+<p>Example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Revisionist</span><span class="p">.</span><span class="nx">unregisterStore</span><span class="p">(</span><span class="s1">'myStore'</span><span class="p">)</span>
+<span class="c1">// MyStore is not available anymore</span>
 </pre></div>
       </section>
 
