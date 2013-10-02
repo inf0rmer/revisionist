@@ -84,7 +84,7 @@ rev.diff(0, 1, function(hash){
 })
 ```
 
-**visualDiff(version1, version2)**
+**visualDiff(version1, version2, callback)**
 
 This function will produce an HTML annotated diff string. If any non-String values are detected, an Error will be thrown.
 
@@ -92,8 +92,9 @@ This function will produce an HTML annotated diff string. If any non-String valu
 rev.change('fox')
 rev.change('the brown fox jumped over the lazy wizard')
 
-rev.visualDiff()
-// -> <ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>
+rev.visualDiff(0, 1, function(html){
+  // html === <ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>
+})
 ```
 
 **getLatestVersionNumber**
