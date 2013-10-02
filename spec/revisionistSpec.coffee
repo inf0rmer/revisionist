@@ -106,8 +106,16 @@ define ['revisionist'], (Revisionist) ->
       rev.change('bacon')
       rev.change('pineapples')
 
-      recovered = rev.recover(0)
-      expect(recovered).toEqual('bacon')
+      recovered = false
+
+      rev.recover(0, (data) -> recovered = data)
+
+      waitsFor ->
+        recovered
+      , 100
+
+      runs ->
+        expect(recovered).toEqual('bacon')
 
   describe '#recover', ->
     rev = null
@@ -146,11 +154,11 @@ define ['revisionist'], (Revisionist) ->
 
     it 'calls the store\'s "get" method with the revision number as an argument', ->
       class CustomStore
-        get: (version) ->
-          "bacon"
+        get: (version, callback) ->
+          callback "bacon"
 
         size: ->
-          1
+          return 1
 
         clear: ->
 
@@ -158,7 +166,16 @@ define ['revisionist'], (Revisionist) ->
 
       rev = new Revisionist {store: 'custom'}
 
-      expect( do rev.recover).toEqual('bacon')
+      recovered = false
+
+      rev.recover(0, (data) -> recovered = data)
+
+      waitsFor ->
+        recovered
+      , 100
+
+      runs ->
+        expect(recovered).toEqual('bacon')
 
       Revisionist.unregisterStore 'custom'
 
@@ -174,7 +191,7 @@ define ['revisionist'], (Revisionist) ->
 
       rev = new Revisionist {plugin: 'custom'}
       rev.change('bacon')
-      rev.recover(0)
+      rev.recover(0, ->)
 
       expect(spy).toHaveBeenCalledWith('bacon')
 
@@ -193,7 +210,7 @@ define ['revisionist'], (Revisionist) ->
 
       rev = new Revisionist {plugin: 'custom'}
       rev.change('pancakes')
-      rev.recover()
+      rev.recover(0, ->)
 
       expect(spy).toHaveBeenCalled()
 
@@ -205,7 +222,13 @@ define ['revisionist'], (Revisionist) ->
       rev.change('bananas')
       rev.change('oranges')
 
-      recovered = rev.recover()
+      recovered = false
+
+      rev.recover(null, (data) -> recovered = data)
+
+      waitsFor ->
+        recovered
+      , 100
 
       expect(recovered).toEqual('oranges')
 
@@ -224,29 +247,51 @@ define ['revisionist'], (Revisionist) ->
       rev.change 3
       rev.change 10
 
-      diff = rev.diff(0, 2)
-      expect(diff.old).toEqual(1)
-      expect(diff.new).toEqual(10)
+      diff = null
+
+      waitsFor ->
+        diff
+      , 100
+
+      rev.diff(0, 2, (data)-> diff = data )
+
+      runs ->
+        expect(diff.old).toEqual(1)
+        expect(diff.new).toEqual(10)
 
     it 'compares the two most recent versions if no parameters are passed in', ->
       rev.change 1
       rev.change 3
       rev.change 10
 
-      diff = rev.diff()
+      diff = null
 
-      expect(diff.old).toEqual(3)
-      expect(diff.new).toEqual(10)
+      waitsFor ->
+        diff
+      , 100
+
+      rev.diff(null, null, (data)-> diff = data)
+
+      runs ->
+        expect(diff.old).toEqual(3)
+        expect(diff.new).toEqual(10)
 
     it 'compares the passed in version against the version before it if only one parameter is passed in', ->
       rev.change 1
       rev.change 3
       rev.change 10
 
-      diff = rev.diff(1)
+      diff = null
 
-      expect(diff.old).toEqual(1)
-      expect(diff.new).toEqual(3)
+      waitsFor ->
+        diff
+      , 100
+
+      rev.diff(1, null, (data)-> diff = data)
+
+      runs ->
+        expect(diff.old).toEqual(1)
+        expect(diff.new).toEqual(3)
 
   describe '#visualDiff', ->
 
@@ -272,8 +317,16 @@ define ['revisionist'], (Revisionist) ->
       rev.change 'the brown fox jumped over the lazy wizard'
       expectedDiff = '<ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>'
 
-      diff = rev.visualDiff()
-      expect(diff).toEqual(expectedDiff)
+      diff = null
+
+      rev.visualDiff(null, null, (data) -> diff = data)
+
+      waitsFor ->
+        diff
+      , 100
+
+      runs ->
+        expect(diff).toEqual(expectedDiff)
 
   describe '#getLatestVersionNumber', ->
     rev = null

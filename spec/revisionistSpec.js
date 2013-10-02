@@ -125,8 +125,16 @@
         rev.change('bananas');
         rev.change('bacon');
         rev.change('pineapples');
-        recovered = rev.recover(0);
-        return expect(recovered).toEqual('bacon');
+        recovered = false;
+        rev.recover(0, function(data) {
+          return recovered = data;
+        });
+        waitsFor(function() {
+          return recovered;
+        }, 100);
+        return runs(function() {
+          return expect(recovered).toEqual('bacon');
+        });
       });
     });
     describe('#recover', function() {
@@ -179,12 +187,12 @@
         }).toThrow(e);
       });
       it('calls the store\'s "get" method with the revision number as an argument', function() {
-        var CustomStore;
+        var CustomStore, recovered;
         CustomStore = (function() {
           function CustomStore() {}
 
-          CustomStore.prototype.get = function(version) {
-            return "bacon";
+          CustomStore.prototype.get = function(version, callback) {
+            return callback("bacon");
           };
 
           CustomStore.prototype.size = function() {
@@ -200,7 +208,16 @@
         rev = new Revisionist({
           store: 'custom'
         });
-        expect(rev.recover()).toEqual('bacon');
+        recovered = false;
+        rev.recover(0, function(data) {
+          return recovered = data;
+        });
+        waitsFor(function() {
+          return recovered;
+        }, 100);
+        runs(function() {
+          return expect(recovered).toEqual('bacon');
+        });
         return Revisionist.unregisterStore('custom');
       });
       it('calls the plugin\'s "recover" method with the revision value as an argument', function() {
@@ -217,7 +234,7 @@
           plugin: 'custom'
         });
         rev.change('bacon');
-        rev.recover(0);
+        rev.recover(0, function() {});
         expect(spy).toHaveBeenCalledWith('bacon');
         return Revisionist.unregisterPlugin('custom');
       });
@@ -236,7 +253,7 @@
           plugin: 'custom'
         });
         rev.change('pancakes');
-        rev.recover();
+        rev.recover(0, function() {});
         expect(spy).toHaveBeenCalled();
         return Revisionist.unregisterPlugin('custom');
       });
@@ -246,7 +263,13 @@
         rev.change('bacon');
         rev.change('bananas');
         rev.change('oranges');
-        recovered = rev.recover();
+        recovered = false;
+        rev.recover(null, function(data) {
+          return recovered = data;
+        });
+        waitsFor(function() {
+          return recovered;
+        }, 100);
         return expect(recovered).toEqual('oranges');
       });
     });
@@ -265,27 +288,51 @@
         rev.change(1);
         rev.change(3);
         rev.change(10);
-        diff = rev.diff(0, 2);
-        expect(diff.old).toEqual(1);
-        return expect(diff["new"]).toEqual(10);
+        diff = null;
+        waitsFor(function() {
+          return diff;
+        }, 100);
+        rev.diff(0, 2, function(data) {
+          return diff = data;
+        });
+        return runs(function() {
+          expect(diff.old).toEqual(1);
+          return expect(diff["new"]).toEqual(10);
+        });
       });
       it('compares the two most recent versions if no parameters are passed in', function() {
         var diff;
         rev.change(1);
         rev.change(3);
         rev.change(10);
-        diff = rev.diff();
-        expect(diff.old).toEqual(3);
-        return expect(diff["new"]).toEqual(10);
+        diff = null;
+        waitsFor(function() {
+          return diff;
+        }, 100);
+        rev.diff(null, null, function(data) {
+          return diff = data;
+        });
+        return runs(function() {
+          expect(diff.old).toEqual(3);
+          return expect(diff["new"]).toEqual(10);
+        });
       });
       return it('compares the passed in version against the version before it if only one parameter is passed in', function() {
         var diff;
         rev.change(1);
         rev.change(3);
         rev.change(10);
-        diff = rev.diff(1);
-        expect(diff.old).toEqual(1);
-        return expect(diff["new"]).toEqual(3);
+        diff = null;
+        waitsFor(function() {
+          return diff;
+        }, 100);
+        rev.diff(1, null, function(data) {
+          return diff = data;
+        });
+        return runs(function() {
+          expect(diff.old).toEqual(1);
+          return expect(diff["new"]).toEqual(3);
+        });
       });
     });
     describe('#visualDiff', function() {
@@ -312,8 +359,16 @@
         rev.change('fox');
         rev.change('the brown fox jumped over the lazy wizard');
         expectedDiff = '<ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>';
-        diff = rev.visualDiff();
-        return expect(diff).toEqual(expectedDiff);
+        diff = null;
+        rev.visualDiff(null, null, function(data) {
+          return diff = data;
+        });
+        waitsFor(function() {
+          return diff;
+        }, 100);
+        return runs(function() {
+          return expect(diff).toEqual(expectedDiff);
+        });
       });
     });
     describe('#getLatestVersionNumber', function() {

@@ -50,22 +50,24 @@ rev.change('bananas')
 // -> 'bananas'
 ```
 
-**recover(version)**
+**recover(version, callback)**
 
-Recovers a previous version of your content and returns it.
+Asynchronously recovers a previous version of your content.
 ```javascript
 rev.change('tomatoes')
 
-rev.recover(0)
-// -> 'bananas'
+rev.recover(0, function(data){
+  // data === 'bananas'
+})
 
-rev.recover(1)
-// -> 'tomatoes'
+rev.recover(1, function(data){
+  // data === 'tomatoes'
+})
 ```
 
-**diff(version1, version2)**
+**diff(version1, version2, callback)**
 
-Presents the difference between two versions.
+Asynchronously presents the difference between two versions.
 If no parameters are passed in, the two latest versions are assumed.
 If only the first parameter is passed, it is checked against the version before it.
 
@@ -77,11 +79,12 @@ Calling diff returns a hash with two keys, ```old``` and ```new```, containing t
 rev.change(2)
 rev.change(10)
 
-rev.diff()
-// -> { old: 2, new: 10 }
+rev.diff(0, 1, function(hash){
+  // hash == { old: 2, new: 10 }
+})
 ```
 
-**visualDiff(version1, version2)**
+**visualDiff(version1, version2, callback)**
 
 This function will produce an HTML annotated diff string. If any non-String values are detected, an Error will be thrown.
 
@@ -89,8 +92,9 @@ This function will produce an HTML annotated diff string. If any non-String valu
 rev.change('fox')
 rev.change('the brown fox jumped over the lazy wizard')
 
-rev.visualDiff()
-// -> <ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>
+rev.visualDiff(0, 1, function(html){
+  // html === <ins>the </ins><ins>brown </ins> fox <ins>jumped </ins><ins>over </ins><ins>the </ins><ins>lazy </ins><ins>wizard\n</ins>
+})
 ```
 
 **getLatestVersionNumber**
