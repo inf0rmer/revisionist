@@ -294,9 +294,9 @@ If only the first parameter is passed, it is checked against the version before 
 
 <p>Stores a new version. The value is user-supplied and the version number is an Integer supplied by Revisionist stating which version number should be saved.</p>
 
-<p><strong>get (version)</strong></p>
+<p><strong>get (version, callback)</strong></p>
 
-<p>Retrieves the value for a specific version. The version number is an Integer supplied by Revisionist. It is already clamped to minimize chances that the version number is invalid.</p>
+<p>Retrieves the value for a specific version and executes the callback with it as an argument. The version number is an Integer supplied by Revisionist. It is already clamped to minimize chances that the version number is invalid.</p>
 
 <p><strong>remove (version)</strong></p>
 
